@@ -1,19 +1,11 @@
+import { useFetch } from "@/hooks/hooks";
+
 export function getMovieByName(name: string) {
-const baseUrl = process.env.NEST_SERVER_URL || 'http://localhost:3011';
-  return fetch(`${baseUrl}/movies?name=${encodeURIComponent(name)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(
-        res => {
-            try {
-                return res.json();
-            } catch (error) {
-                console.error("Error parsing JSON:", error);
-                throw error;
-            }
-        }
-    );
+  const baseUrl = process.env.NEXT_PUBLIC_NEST_URL;
+  console.log("Base URL:", baseUrl); // Debug log to check the base URL
+  return useFetch(
+    `${baseUrl}/movies`,
+    { method: "GET" },
+    { query: name, include_adult: false, language: "uk", page: 1 }
+  );
 }

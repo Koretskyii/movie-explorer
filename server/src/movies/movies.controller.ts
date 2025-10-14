@@ -7,6 +7,6 @@ export class MoviesController {
 
   @Get()
   async getMovieByName(@Query('name') name: string) {
-    return this.moviesService.getMovieByName(name);
+    return this.moviesService.getTMDBMoviesByName(name);
   }
 }

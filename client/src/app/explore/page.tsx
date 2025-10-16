@@ -10,10 +10,11 @@ import { ChangeEvent, useState } from "react";
 
 export default function ExplorePage() {
   const [movieName, setMovieName] = useState("");
-
+  const [moviesToRender, setMoviesToRender] = useState<any[]>([]);
   const handleSearch = async () => {
     const data = await getMovieByName(movieName);
     console.log("Movie data: ", data);
+    setMoviesToRender([...data]);
   };
 
   const handleChangeMovieSearchInput = (
@@ -50,6 +51,12 @@ export default function ExplorePage() {
           Search
         </Button>
       </Container>
+      {moviesToRender?.map((movie, index) => (
+        <div key={index}>
+          <h2>{movie.title}</h2>
+          <p>{movie.overview}</p>
+        </div>
+      ))}
       {/* Movie exploration content goes here */}
       <Footer />
     </div>

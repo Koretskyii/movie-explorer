@@ -12,6 +12,7 @@ export class MoviesController {
     @Query('language') language: string,
     @Query('page') page: number,
   ) {
+
     return this.moviesService.getTMDBMoviesByName(
       query,
       include_adult,

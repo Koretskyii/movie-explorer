@@ -13,7 +13,6 @@ export class MoviesController {
     @Query('page') page: number,
   ) {
     const params = { query, include_adult, language, page };
-
     return this.moviesService.getTMDBMoviesByName(params);
   }
 }

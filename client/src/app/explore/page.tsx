@@ -1,11 +1,10 @@
 "use client";
 
 import { getMovieByName } from "@/api/api";
-import { Footer } from "@/components/Footer/Footer";
-import { Header } from "@/components/Header/Header";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Input from "@mui/material/Input";
+import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 
 export default function ExplorePage() {
@@ -20,7 +19,6 @@ export default function ExplorePage() {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const inputValue = event.target.value;
-    console.log("Movie search input changed:", inputValue);
     setMovieName(inputValue);
   };
 
@@ -51,7 +49,9 @@ export default function ExplorePage() {
       </Container>
       {moviesToRender?.map((movie, index) => (
         <div key={index}>
-          <h2>{movie.title}</h2>
+          <Link href={`/movie/${movie.id}`}>
+            <h2>{movie.title}</h2>
+          </Link>
           <p>{movie.overview}</p>
         </div>
       ))}

@@ -13,7 +13,6 @@ export default function ExplorePage() {
   const [moviesToRender, setMoviesToRender] = useState<any[]>([]);
   const handleSearch = async () => {
     const data = await getMovieByName(movieName);
-    console.log("Movie data: ", data);
     setMoviesToRender([...data]);
   };
 
@@ -27,7 +26,6 @@ export default function ExplorePage() {
 
   return (
     <div>
-      <Header />
       <h1>Explore Movies</h1>
       <Container
         maxWidth="sm"
@@ -58,7 +56,6 @@ export default function ExplorePage() {
         </div>
       ))}
       {/* Movie exploration content goes here */}
-      <Footer />
     </div>
   );
 }

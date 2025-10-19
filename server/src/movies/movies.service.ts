@@ -7,46 +7,66 @@ export class MoviesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getMovieByName(name: string) {
-    if (!name) {
+    if (!name?.trim()) {
       throw new HttpException('Name query is required', HttpStatus.BAD_REQUEST);
     }
-    return JSON.stringify({ name: name, info: 'This is a mock movie data.' });
+    return JSON.stringify({ name, info: 'This is a mock movie data.' });
   }
 
-  async getTMDBMoviesByName(
+  async getTMDBMoviesByName(params: {
+    query: string;
+    include_adult: string;
+    language: string;
+    page: number;
+  }) {
+    const { query: name, include_adult, language, page } = params;
+    if (!name?.trim()) {
+      throw new HttpException('Name query is required', HttpStatus.BAD_REQUEST);
+    }
+
+    const url = this.buildTMDBUrl(name, include_adult, language, page);
+    const options = this.getTMDBRequestOptions();
+
+    const response = await fetch(url, options);
+    const text = await response.text();
+
+    if (!text) return [];
+
+    return this.filterUkrainianMovies(JSON.parse(text).results).slice(0, 5);
+  }
+
+  private buildTMDBUrl(
     name: string,
     include_adult: string,
     language: string,
     page: number,
-  ) {
-    // await this.prisma.movie.create({
-    //   data: {
-    //     title: name,
-    //     description: 'test 1',
-    //     releaseDate: new Date(),
-    //     rating: 5,
-    //   },
-    // });
-    
-    const url = `https://api.themoviedb.org/3/search/movie?query=${name}&include_adult=${include_adult}&language=${language}&page=${page}`;
-    const options = {
+  ): string {
+    const baseUrl = 'https://api.themoviedb.org/3/search/movie';
+    const params = new URLSearchParams({
+      query: name,
+      include_adult,
+      language,
+      page: page.toString(),
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  private getTMDBRequestOptions() {
+    return {
       method: 'GET',
       headers: {
         accept: 'application/json',
         Authorization: `Bearer ${process.env.TMDB_TOKEN}`,
       },
     };
+  }
 
-    const response = await fetch(url, options);
-
-    const text = await response.text();
-    if (!text) return {};
-
-    const json = JSON.parse(text)
-      .results.filter((movie: Record<string, any>) => {
-        return franc(movie.title) === 'ukr' || franc(movie.overview) === 'ukr';
-      })
-      .slice(0, 5);
-    return json;
+  private filterUkrainianMovies(movies: Record<string, any>[]) {
+    return movies.filter((movie) => {
+      return (
+        franc(movie.title || '') === 'ukr' ||
+        franc(movie.overview || '') === 'ukr'
+      );
+    });
   }
 }

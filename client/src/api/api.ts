@@ -1,10 +1,8 @@
 import { useFetch } from "@/hooks/hooks";
-
+import { MOVIES_URL } from "@/constants/constants";
 export function getMovieByName(name: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_NEST_URL;
-  console.log("Base URL:", baseUrl); // Debug log to check the base URL
   return useFetch(
-    `${baseUrl}/movies`,
+    `${MOVIES_URL}`,
     { method: "GET" },
     { query: name, include_adult: false, language: "uk", page: 1 }
   );

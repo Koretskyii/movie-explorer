@@ -24,7 +24,7 @@ export class MoviesService {
       throw new HttpException('Name query is required', HttpStatus.BAD_REQUEST);
     }
 
-    const url = this.buildTMDBUrl(name, include_adult, language, page);
+    const url = this.buildTMDBSearchUrl(name, include_adult, language, page);
     const options = this.getTMDBRequestOptions();
 
     const response = await fetch(url, options);
@@ -35,7 +35,35 @@ export class MoviesService {
     return this.filterUkrainianMovies(JSON.parse(text).results).slice(0, 5);
   }
 
-  private buildTMDBUrl(
+  async getTMDBPopularMovies(params: {
+    include_adult: string;
+    language: string;
+    page: number;
+  }) {
+    const { include_adult, language, page } = params;
+
+    const url = this.buildTMDBPopularUrl(include_adult, language, page);
+    const options = this.getTMDBRequestOptions();
+
+    const response = await fetch(url, options);
+    const text = await response.text();
+
+    if (!text) return [];
+
+    return this.filterUkrainianMovies(JSON.parse(text).results).slice(0, 5);
+  }
+
+  private buildTMDBPopularUrl(
+    include_adult: string,
+    language: string,
+    page: number,
+  ): string {
+    const baseUrl = 'https://api.themoviedb.org/3/discover/movie';
+    const params = new URLSearchParams({ include_adult, language, page: page.toString() });
+    return `${baseUrl}?${params.toString()}&sort_by=popularity.desc`;
+  }
+
+   private buildTMDBSearchUrl(
     name: string,
     include_adult: string,
     language: string,

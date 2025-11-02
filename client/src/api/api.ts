@@ -1,9 +1,26 @@
 import { useFetch } from "@/hooks/hooks";
 import { MOVIES_URL } from "@/constants/constants";
+import { MovieApiParams, SearchMovieApiParams } from "@/types/types";
+
 export function getMovieByName(name: string) {
-  return useFetch(
-    `${MOVIES_URL}`,
-    { method: "GET" },
-    { query: name, include_adult: false, language: "uk", page: 1 }
-  );
+  const params: SearchMovieApiParams = {
+    query: name,
+    include_adult: false,
+    language: "uk",
+    page: 1,
+  };
+  const options: RequestInit = { method: "GET" };
+
+  return useFetch(MOVIES_URL, options, params);
+}
+
+export function getMovieByPopularity() {
+  const params: MovieApiParams = {
+    include_adult: false,
+    language: "uk",
+    page: 1,
+  };
+  const options: RequestInit = { method: "GET" };
+
+  return useFetch(`${MOVIES_URL}/popular`, options, params);
 }

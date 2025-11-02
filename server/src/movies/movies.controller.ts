@@ -15,4 +15,14 @@ export class MoviesController {
     const params = { query, include_adult, language, page };
     return this.moviesService.getTMDBMoviesByName(params);
   }
+
+  @Get('popular')
+  async getPopularMovies(
+    @Query('include_adult') include_adult: string,
+    @Query('language') language: string,
+    @Query('page') page: number,
+  ) {
+    const params = { include_adult, language, page };
+    return this.moviesService.getTMDBPopularMovies(params);
+  }
 }

@@ -53,17 +53,126 @@ export class MoviesService {
     return this.filterUkrainianMovies(JSON.parse(text).results).slice(0, 5);
   }
 
+  isGenreIdArray(genreId: number | number[]): genreId is number[] {
+    if (Array.isArray(genreId)) {
+      return true;
+    }
+    return false;
+  }
+
+  isGenreListIsString(genreList: string | null): genreList is string | null {
+    if (typeof genreList === 'string') {
+      return true;
+    }
+    return false;
+  }
+
+  async getTMDBMoviesByGenreId(
+    with_genres: string,
+    params: {
+      include_adult: string;
+      language: string;
+      page: number;
+    },
+  ) {
+    const { include_adult, language, page } = params;
+    const options = this.getTMDBRequestOptions();
+    let response: Response | Response[];
+
+    const withSplittedGenres = with_genres.split(',');
+
+    try {
+      let response: Response | Response[];
+
+      if (withSplittedGenres.length > 1) {
+        const genreUrls = withSplittedGenres.map((genreId) => ({
+          genreId,
+          url: this.buildTMDBByGenreUrl(genreId, include_adult, language, page),
+        }));
+
+        const responses = await Promise.all(
+          genreUrls.map(async ({ url, genreId }) => {
+            const res = await fetch(url, options);
+            if (!res.ok) {
+              throw new Error('Failed to fetch movies by genre');
+            }
+            const data = await res.json();
+            return {
+              genre: genreId,
+              movies: this.filterUkrainianMovies(data.results).slice(0, 5),
+            };
+          }),
+        );
+
+        return responses.map((item) => [item]); // Зберігаємо структуру відповіді
+      } else {
+        const genre = withSplittedGenres[0];
+        const url = this.buildTMDBByGenreUrl(
+          genre,
+          include_adult,
+          language,
+          page,
+        );
+
+        const res = await fetch(url, options);
+        if (!res.ok) {
+          throw new Error('Failed to fetch movies by genre');
+        }
+
+        const data = await res.json();
+        return [
+          {
+            genre: with_genres,
+            movies: this.filterUkrainianMovies(data.results).slice(0, 5),
+          },
+        ];
+      }
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch movies by genre',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private isResponseArray<T>(response: T | T[]): response is T[] {
+    if (Array.isArray(response)) {
+      return true;
+    }
+    return false;
+  }
+
   private buildTMDBPopularUrl(
     include_adult: string,
     language: string,
     page: number,
   ): string {
     const baseUrl = 'https://api.themoviedb.org/3/discover/movie';
-    const params = new URLSearchParams({ include_adult, language, page: page.toString() });
+    const params = new URLSearchParams({
+      include_adult,
+      language,
+      page: page.toString(),
+    });
     return `${baseUrl}?${params.toString()}&sort_by=popularity.desc`;
   }
+  private buildTMDBByGenreUrl(
+    byGenre: string,
+    include_adult: string,
+    language: string,
+    page: number,
+  ): string {
+    // TODO: Implement genre-based movie fetching URL construction
+    const baseUrl = 'https://api.themoviedb.org/3/discover/movie';
+    const params = new URLSearchParams({
+      include_adult,
+      language,
+      page: page.toString(),
+      with_genres: byGenre.toString(),
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
 
-   private buildTMDBSearchUrl(
+  private buildTMDBSearchUrl(
     name: string,
     include_adult: string,
     language: string,

@@ -1,6 +1,11 @@
 "use client";
 
-import { getMovieByName, getMovieByPopularity } from "@/api/api";
+import {
+  getMovieByName,
+  getMovieByPopularity,
+  getMoviesByAllGenres,
+} from "@/api/api";
+import { GENRES } from "@/constants/constants";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
@@ -13,10 +18,17 @@ export default function ExplorePage() {
   const [movieName, setMovieName] = useState("");
   const [moviesToRender, setMoviesToRender] = useState<any[]>([]);
   const [popularMovies, setPopularMovies] = useState<any[]>([]);
-
+  const [moviesByGenres, setMoviesByGenres] = useState<any[]>([]);
   useEffect(() => {
     retrievePopularMovies();
+    retrieveMoviesByAllGenres();
   }, []);
+
+  function retrieveMoviesByAllGenres() {
+    getMoviesByAllGenres().then((data) => {
+      setMoviesByGenres([...data]);
+    });
+  }
 
   function retrievePopularMovies() {
     getMovieByPopularity().then((data) => {
@@ -26,7 +38,7 @@ export default function ExplorePage() {
 
   const handleSearch = async () => {
     const data = await getMovieByName(movieName);
-    setMoviesToRender([...data]);
+    setMoviesToRender({ ...data });
   };
 
   const handleChangeMovieSearchInput = (
@@ -105,7 +117,102 @@ export default function ExplorePage() {
           <p>{movie.overview}</p>
         </div>
       ))}
-      {/* Movie exploration content goes here */}
+      <Container maxWidth="lg">
+        <Box sx={{ my: 4 }}>
+          <Typography
+            variant="h5"
+            textAlign="center"
+            gutterBottom
+            sx={{ fontWeight: 600 }}
+          >
+            Фільми за жанрами
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 4,
+              mt: 2,
+            }}
+          >
+            {moviesByGenres.map((genreSet, index) => (
+              <Box
+                key={index}
+                sx={{
+                  border: "1px solid #ddd",
+                  borderRadius: 3,
+                  padding: 3,
+                  backgroundColor: "#fafafa",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+                  width: "100%",
+                  maxWidth: 1000,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    textAlign: "center",
+                    mb: 3,
+                    fontWeight: 600,
+                    color: "#333",
+                  }}
+                >
+                  {Object.values(GENRES).find(
+                    (genre) => genre.id == genreSet[0].genre
+                  )?.name || "Unknown Genre"}
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: 2,
+                    justifyContent: "center",
+                  }}
+                >
+                  {genreSet[0].movies.map((movie: any, index: number) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        border: "1px solid #ccc",
+                        borderRadius: 2,
+                        padding: 2,
+                        width: 180,
+                        textAlign: "center",
+                        backgroundColor: "#fff",
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+                        transition: "transform 0.2s",
+                        "&:hover": {
+                          transform: "scale(1.02)",
+                          borderColor: "#999",
+                        },
+                      }}
+                    >
+                      <Link
+                        href={`/movie/${movie.id}`}
+                        style={{ textDecoration: "none", color: "inherit" }}
+                      >
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: "1rem",
+                            color: "#222",
+                          }}
+                        >
+                          {movie.title}
+                        </Typography>
+                      </Link>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      </Container>
     </div>
   );
 }

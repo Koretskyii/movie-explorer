@@ -9,7 +9,11 @@ export function Header() {
     <div style={{ position: "relative" }}>
       <AppBar position="absolute" sx={{ width: "100%" }} color="primary">
         <Toolbar sx={{ justifyContent: "center" }}>
-          <Typography variant="h6">Movie Explorer</Typography>
+          <Typography variant="h6">
+            <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
+              Movie Explorer
+            </Link>
+          </Typography>
         </Toolbar>
         <Link
           href="/account"

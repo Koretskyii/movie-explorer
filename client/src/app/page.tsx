@@ -1,5 +1,5 @@
 'use client'
-import { Main } from "../components/Main/Main";
+import { Main } from "../components/Layout/Main/Main";
 
 export default function Home() {
   return (

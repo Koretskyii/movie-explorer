@@ -1,22 +1,20 @@
 "use client";
 
 import {
-  getMovieByName,
   getMovieByPopularity,
   getMoviesByAllGenres,
 } from "@/api/api";
+import Search from "@/components/UI/Search/Search";
 import { GENRES } from "@/constants/constants";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import Input from "@mui/material/Input";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import { ChangeEvent, useEffect, useState } from "react";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function ExplorePage() {
-  const [movieName, setMovieName] = useState("");
-  const [moviesToRender, setMoviesToRender] = useState<any[]>([]);
+  const [searchInput, setSearchInput] = useState("");
   const [popularMovies, setPopularMovies] = useState<any[]>([]);
   const [moviesByGenres, setMoviesByGenres] = useState<any[]>([]);
   useEffect(() => {
@@ -37,42 +35,20 @@ export default function ExplorePage() {
   }
 
   const handleSearch = async () => {
-    const data = await getMovieByName(movieName);
-    setMoviesToRender({ ...data });
+    redirect(`/search?input=${searchInput}`);
   };
 
-  const handleChangeMovieSearchInput = (
+  const handleChangeSearchInput = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const inputValue = event.target.value;
-    setMovieName(inputValue);
+    setSearchInput(inputValue);
   };
 
   return (
     <div>
       <h1>Explore Movies</h1>
-      <Container
-        maxWidth="sm"
-        sx={{ my: 2, display: "flex", flexDirection: "row", gap: 2 }}
-      >
-        <Input
-          id="movie-search"
-          type="text"
-          placeholder="Search for movies..."
-          fullWidth
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            handleChangeMovieSearchInput(event)
-          }
-        />
-        <Button
-          onClick={() => handleSearch()}
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-        >
-          Search
-        </Button>
-      </Container>
+      <Search onChange={handleChangeSearchInput} onSearch={handleSearch} />
       <Container>
         <Box sx={{ my: 2 }}>
           <Typography variant="h5">Популярні фільми</Typography>
@@ -99,7 +75,7 @@ export default function ExplorePage() {
                 }}
               >
                 <Link
-                  href={`/movie/${movie.id}`}
+                  href={`explore/movie/${movie.id}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
                   <Typography variant="subtitle1">{movie.title}</Typography>
@@ -109,14 +85,7 @@ export default function ExplorePage() {
           </Box>
         </Box>
       </Container>
-      {moviesToRender?.map((movie, index) => (
-        <div key={index}>
-          <Link href={`/movie/${movie.id}`}>
-            <h2>{movie.title}</h2>
-          </Link>
-          <p>{movie.overview}</p>
-        </div>
-      ))}
+
       <Container maxWidth="lg">
         <Box sx={{ my: 4 }}>
           <Typography
@@ -159,9 +128,11 @@ export default function ExplorePage() {
                     color: "#333",
                   }}
                 >
-                  {Object.values(GENRES).find(
-                    (genre) => genre.id == genreSet[0].genre
-                  )?.name || "Unknown Genre"}
+                  <Link href={`/explore/genre/${genreSet[0].genre}`} style={{ textDecoration: "none", color: "inherit" }}>
+                    {Object.values(GENRES).find(
+                      (genre) => genre.id == genreSet[0].genre
+                    )?.name || "Unknown Genre"}
+                  </Link>
                 </Typography>
                 <Box
                   sx={{
@@ -191,7 +162,7 @@ export default function ExplorePage() {
                       }}
                     >
                       <Link
-                        href={`/movie/${movie.id}`}
+                        href={`explore/movie/${movie.id}`}
                         style={{ textDecoration: "none", color: "inherit" }}
                       >
                         <Typography

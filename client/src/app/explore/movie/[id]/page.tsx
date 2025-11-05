@@ -1,4 +1,4 @@
-export default function MoviePage() {
+export default function MoviePage() {    
     return (
         <>
         Movie page

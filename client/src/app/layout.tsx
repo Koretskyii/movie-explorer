@@ -2,8 +2,8 @@ import { Roboto } from "next/font/google";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import theme from "@/theme";
 import { ThemeProvider } from "@mui/material/styles";
-import { Header } from "@/components/Header/Header";
-import { Footer } from "@/components/Footer/Footer";
+import { Header } from "@/components/Layout/Header/Header";
+import { Footer } from "@/components/Layout/Footer/Footer";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],

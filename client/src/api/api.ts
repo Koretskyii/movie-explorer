@@ -21,7 +21,7 @@ export const fetchApi = async (
   );
 };
 
-export function getMovieByName(name: string, page: number) {
+export async function getMovieByName(name: string, page: number) {
   const params: SearchMovieApiParams = {
     query: name,
     include_adult: false,
@@ -33,7 +33,7 @@ export function getMovieByName(name: string, page: number) {
   return fetchApi(MOVIES_URL, options, params);
 }
 
-export function getMovieByPopularity() {
+export async function getMovieByPopularity() {
   const params: MovieApiParams = {
     include_adult: false,
     language: "uk",
@@ -58,7 +58,7 @@ export async function getMoviesByAllGenres() {
   return fetchApi(`${MOVIES_URL}/genre`, options, params);
 }
 
-export function getTopMoviesByGenreId(genreId: number) {
+export async function getTopMoviesByGenreId(genreId: number) {
   const params: MovieApiParams = {
     include_adult: false,
     language: "uk",

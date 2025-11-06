@@ -1,18 +1,37 @@
-import { useFetch } from "@/hooks/hooks";
 import { GENRES, MOVIES_URL } from "@/constants/constants";
 import { MovieApiParams, SearchMovieApiParams } from "@/types/types";
+import { buildFetchOptions } from "@/utils/utils";
 
-  export function getMovieByName(name: string, page: number) {
-    const params: SearchMovieApiParams = {
-      query: name,
-      include_adult: false,
-      language: "uk",
-      page,
-    };
-    const options: RequestInit = { method: "GET" };
+export const fetchApi = async (
+  url: string,
+  options: RequestInit,
+  params: Record<string, any>
+) => {
+  const queryString = new URLSearchParams(params).toString();
+  return fetch(`${url}?${queryString}`, buildFetchOptions(options)).then(
+    (res) => {
+      try {
+        const data = res.json();
+        return data;
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+        throw error;
+      }
+    }
+  );
+};
 
-    return useFetch(MOVIES_URL, options, params);
-  }
+export function getMovieByName(name: string, page: number) {
+  const params: SearchMovieApiParams = {
+    query: name,
+    include_adult: false,
+    language: "uk",
+    page,
+  };
+  const options: RequestInit = { method: "GET" };
+
+  return fetchApi(MOVIES_URL, options, params);
+}
 
 export function getMovieByPopularity() {
   const params: MovieApiParams = {
@@ -22,7 +41,7 @@ export function getMovieByPopularity() {
   };
   const options: RequestInit = { method: "GET" };
 
-  return useFetch(`${MOVIES_URL}/popular`, options, params);
+  return fetchApi(`${MOVIES_URL}/popular`, options, params);
 }
 
 export async function getMoviesByAllGenres() {
@@ -30,11 +49,13 @@ export async function getMoviesByAllGenres() {
     include_adult: false,
     language: "uk",
     page: 1,
-    with_genres: Object.values(GENRES).map((genre) => genre.id).join(","),
+    with_genres: Object.values(GENRES)
+      .map((genre) => genre.id)
+      .join(","),
   };
   const options: RequestInit = { method: "GET" };
 
-  return useFetch(`${MOVIES_URL}/genre`, options, params);
+  return fetchApi(`${MOVIES_URL}/genre`, options, params);
 }
 
 export function getTopMoviesByGenreId(genreId: number) {
@@ -45,5 +66,5 @@ export function getTopMoviesByGenreId(genreId: number) {
   };
   const options: RequestInit = { method: "GET" };
 
-  return useFetch(`${MOVIES_URL}/genre/${genreId}`, options, params);
+  return fetchApi(`${MOVIES_URL}/genre/${genreId}`, options, params);
 }

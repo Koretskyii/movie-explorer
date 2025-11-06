@@ -6,9 +6,10 @@ import { ChangeEvent } from "react";
 export default function Search(props: {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onSearch: (event: React.FormEvent<HTMLElement>) => void;
+  onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => void;
   initialValue?: string;
 }) {
-  const { onChange, onSearch, initialValue } = props;
+  const { onChange, onSearch, onKeyDown, initialValue } = props;
 
   return (
     <Container
@@ -22,6 +23,7 @@ export default function Search(props: {
         defaultValue={initialValue}
         fullWidth
         onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(event)}
+        onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => onKeyDown(event)}
       />
       <Button
         onClick={(event) => onSearch(event)}

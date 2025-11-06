@@ -16,7 +16,7 @@ export default function SearchPage() {
   const [searchInput, setSearchInput] = useState(
     searchParams.get("input") || ""
   );
-  const [moviesToRender, setMoviesToRender] = useState<any[]>([]);
+  const [searchedMovies, setSearchedMovies] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState<number | undefined>();
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function SearchPage() {
       if (searchInput !== "") {
         const data = await getMovieByName(searchInput, currentPage);
         const { results: movies, total_pages: totalPages } = data;
-        setMoviesToRender([...(movies)]);
+        setSearchedMovies([...(movies)]);
         setTotalPages(totalPages);
       }
     }
@@ -50,14 +50,22 @@ export default function SearchPage() {
     router.push(`/search?input=${searchInput}&page=${value}`);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === 'Enter') {
+      handleSearch(event);
+    }
+  };
+
   return (
     <>
       <Search
         onChange={handleChangeSearchInput}
         onSearch={handleSearch}
+        onKeyDown={handleKeyDown}
         initialValue={searchInput}
-      />    
-      {moviesToRender?.map((movie, index) => (
+      />
+      {searchedMovies.length === 0 && <p>No movies found.</p>}
+      {searchedMovies?.map((movie, index) => (
         <div key={index}>
           <Link href={`explore/movie/${movie.id}`}>
             <h2>{movie.title}</h2>
@@ -65,6 +73,7 @@ export default function SearchPage() {
           <p>{movie.overview}</p>
         </div>
       ))}
+      {(totalPages ?? 0) > 1 && 
       <Pagination
         count={totalPages}
         page={currentPage}
@@ -74,6 +83,7 @@ export default function SearchPage() {
           handlePageChange(e, value);
         }}
       />
+      }
     </>
   );
 }

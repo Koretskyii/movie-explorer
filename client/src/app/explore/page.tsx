@@ -50,10 +50,16 @@ export default function ExplorePage() {
     setSearchInput(inputValue);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <div>
       <h1>Explore Movies</h1>
-      <Search onChange={handleChangeSearchInput} onSearch={handleSearch} />
+      <Search onChange={handleChangeSearchInput} onSearch={handleSearch} onKeyDown={handleKeyDown} />
       <Container>
         <Box sx={{ my: 2 }}>
           <Typography variant="h5">Популярні фільми</Typography>

@@ -31,8 +31,7 @@ export class MoviesService {
     const text = await response.text();
 
     if (!text) return [];
-
-    return this.filterUkrainianMovies(JSON.parse(text).results).slice(0, 5);
+    return this.filterUkrainianMovies(JSON.parse(text), true);
   }
 
   async getTMDBPopularMovies(params: {
@@ -50,7 +49,7 @@ export class MoviesService {
 
     if (!text) return [];
 
-    return this.filterUkrainianMovies(JSON.parse(text).results).slice(0, 5);
+    return this.filterUkrainianMovies(JSON.parse(text), false);
   }
 
   isGenreIdArray(genreId: number | number[]): genreId is number[] {
@@ -99,7 +98,7 @@ export class MoviesService {
             const data = await res.json();
             return {
               genre: genreId,
-              movies: this.filterUkrainianMovies(data.results).slice(0, 5),
+              movies: this.filterUkrainianMovies(data, false),
             };
           }),
         );
@@ -123,7 +122,7 @@ export class MoviesService {
         return [
           {
             genre: with_genres,
-            movies: this.filterUkrainianMovies(data.results).slice(0, 5),
+            movies: this.filterUkrainianMovies(data, false),
           },
         ];
       }
@@ -198,12 +197,17 @@ export class MoviesService {
     };
   }
 
-  private filterUkrainianMovies(movies: Record<string, any>[]) {
-    return movies.filter((movie) => {
+  private filterUkrainianMovies(
+    data: Record<string, any[]>,
+    usePagination: boolean,
+  ): Record<string, any[]> | Record<string, any>[] {
+    const movies: Record<string, any>[] = data.results;
+    const filteredMovies = movies.filter((movie) => {
       return (
         franc(movie.title || '') === 'ukr' ||
         franc(movie.overview || '') === 'ukr'
       );
     });
+    return usePagination ? { ...data, results: filteredMovies } : filteredMovies;
   }
 }

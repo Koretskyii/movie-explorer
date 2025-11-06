@@ -1,11 +1,9 @@
 "use client";
 
-import {
-  getMovieByPopularity,
-  getMoviesByAllGenres,
-} from "@/api/api";
+import { getMovieByPopularity, getMoviesByAllGenres } from "@/api/api";
 import Search from "@/components/UI/Search/Search";
 import { GENRES } from "@/constants/constants";
+import { sliceArray } from "@/utils/utils";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -23,14 +21,21 @@ export default function ExplorePage() {
   }, []);
 
   function retrieveMoviesByAllGenres() {
-    getMoviesByAllGenres().then((data) => {
-      setMoviesByGenres([...data]);
+    // TODO: move slicing movies to the server
+    getMoviesByAllGenres().then((genres) => {
+      const filteredMovies = genres.map((genreSet: any) => {
+        return {
+          genre: genreSet[0].genre,
+          movies: sliceArray(genreSet[0].movies, 0, 5),
+        };
+      });
+      setMoviesByGenres([...filteredMovies]);
     });
   }
 
   function retrievePopularMovies() {
-    getMovieByPopularity().then((data) => {
-      setPopularMovies([...data]);
+    getMovieByPopularity().then((movies) => {
+      setPopularMovies([...sliceArray(movies, 0, 5)]);
     });
   }
 
@@ -128,9 +133,12 @@ export default function ExplorePage() {
                     color: "#333",
                   }}
                 >
-                  <Link href={`/explore/genre/${genreSet[0].genre}`} style={{ textDecoration: "none", color: "inherit" }}>
+                  <Link
+                    href={`/explore/genre/${genreSet.genre}`}
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
                     {Object.values(GENRES).find(
-                      (genre) => genre.id == genreSet[0].genre
+                      (genre) => genre.id == genreSet.genre
                     )?.name || "Unknown Genre"}
                   </Link>
                 </Typography>
@@ -143,7 +151,7 @@ export default function ExplorePage() {
                     justifyContent: "center",
                   }}
                 >
-                  {genreSet[0].movies.map((movie: any, index: number) => (
+                  {genreSet.movies.map((movie: any, index: number) => (
                     <Box
                       key={index}
                       sx={{

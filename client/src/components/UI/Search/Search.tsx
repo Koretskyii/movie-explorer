@@ -5,7 +5,7 @@ import { ChangeEvent } from "react";
 
 export default function Search(props: {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  onSearch: () => void;
+  onSearch: (event: React.FormEvent<HTMLElement>) => void;
   initialValue?: string;
 }) {
   const { onChange, onSearch, initialValue } = props;
@@ -24,7 +24,7 @@ export default function Search(props: {
         onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(event)}
       />
       <Button
-        onClick={() => onSearch()}
+        onClick={(event) => onSearch(event)}
         variant="contained"
         color="primary"
         sx={{ mt: 2 }}

@@ -2,25 +2,40 @@
 import { getMovieByName } from "@/api/api";
 import Search from "@/components/UI/Search/Search";
 import Pagination from "@mui/material/Pagination";
-import Link from "next/dist/client/link";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function SearchPage() {
-  const input = useSearchParams().get("input") || '';
+  const searchParams: URLSearchParams = useSearchParams();
+  const router = useRouter();
 
-  const [searchInput, setSearchInput] = useState(input || "");
+  const [currentPage, setCurrentPage] = useState<number>(
+    parseInt(searchParams.get("page") || "1")
+  );
+  const [searchInput, setSearchInput] = useState(
+    searchParams.get("input") || ""
+  );
   const [moviesToRender, setMoviesToRender] = useState<any[]>([]);
+  const [totalPages, setTotalPages] = useState<number | undefined>();
 
   useEffect(() => {
-    if (input !== "") {
-      handleSearch();
+    async function fetchMovies() {
+      if (searchInput !== "") {
+        const data = await getMovieByName(searchInput, currentPage);
+        const { results: movies, total_pages: totalPages } = data;
+        setMoviesToRender([...(movies)]);
+        setTotalPages(totalPages);
+      }
     }
-  }, []);
-  
-  const handleSearch = async () => {
-    const data = await getMovieByName(searchInput);
-    setMoviesToRender([...data]);
+    fetchMovies();
+  }, [searchParams]);
+
+  const handleSearch = (event: React.FormEvent<HTMLElement>) => {
+    event.preventDefault();
+
+    if (searchInput.trim() === "") return;
+    router.push(`/search?input=${searchInput}&page=1`);
   };
 
   const handleChangeSearchInput = (
@@ -30,14 +45,18 @@ export default function SearchPage() {
     setSearchInput(inputValue);
   };
 
+  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
+    setCurrentPage(value);
+    router.push(`/search?input=${searchInput}&page=${value}`);
+  };
+
   return (
     <>
       <Search
         onChange={handleChangeSearchInput}
         onSearch={handleSearch}
-        initialValue={input}
-      />
-      Search page
+        initialValue={searchInput}
+      />    
       {moviesToRender?.map((movie, index) => (
         <div key={index}>
           <Link href={`explore/movie/${movie.id}`}>
@@ -46,7 +65,15 @@ export default function SearchPage() {
           <p>{movie.overview}</p>
         </div>
       ))}
-      <Pagination count={10} variant="outlined" shape="rounded" />
+      <Pagination
+        count={totalPages}
+        page={currentPage}
+        variant="outlined"
+        shape="rounded"
+        onChange={(e, value) => {
+          handlePageChange(e, value);
+        }}
+      />
     </>
   );
 }

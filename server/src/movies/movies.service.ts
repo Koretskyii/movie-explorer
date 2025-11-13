@@ -19,19 +19,76 @@ export class MoviesService {
     language: string;
     page: number;
   }) {
+    const { page } = params;
+
+    type MoviesObj = {
+      results: {};
+      page: number;
+      total_pages: number;
+      total_results: number;
+    };
+    let response: any[] = [];
+    const ITEMS_PER_PAGE = 20;
+    let movieCount = 0;
+    let nextPage = 1;
+    let total_pages = 0;
+
+    while (movieCount < ITEMS_PER_PAGE * page) {
+      const movies: Record<string, any> = await this.fetchMoviesUntilLimit({
+        ...params,
+        page: nextPage,
+      });
+
+      if (!movies?.results?.length) break;
+
+      response.push(...movies.results);
+      movieCount += movies.results.length;
+      nextPage++;
+      total_pages = movies.total_pages;
+
+      if (nextPage > total_pages) break;
+    }
+
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+
+    const filmsForCurrentPage = response.slice(startIndex, endIndex);
+
+    return {
+      page,
+      total_pages,
+      results: filmsForCurrentPage,
+    };
+  }
+
+  async fetchMoviesUntilLimit(params: {
+    query: string;
+    include_adult: string;
+    language: string;
+    page: number;
+  }) {
     const { query: name, include_adult, language, page } = params;
     if (!name?.trim()) {
       throw new HttpException('Name query is required', HttpStatus.BAD_REQUEST);
     }
+    try {
+      const url = this.buildTMDBSearchUrl(name, include_adult, language, page);
+      const options = this.getTMDBRequestOptions();
 
-    const url = this.buildTMDBSearchUrl(name, include_adult, language, page);
-    const options = this.getTMDBRequestOptions();
+      const response = await fetch(url, options);
+      const text = await response.text();
 
-    const response = await fetch(url, options);
-    const text = await response.text();
+      if (!text) return [];
 
-    if (!text) return [];
-    return this.filterUkrainianMovies(JSON.parse(text), true);
+      const temp = this.filterUkrainianMovies(JSON.parse(text), true);
+      console.log(temp);
+      return temp;
+    } catch (err) {
+      throw new HttpException(
+        'Failed to fetch movies by genre',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async getTMDBPopularMovies(params: {
@@ -208,6 +265,8 @@ export class MoviesService {
         franc(movie.overview || '') === 'ukr'
       );
     });
-    return usePagination ? { ...data, results: filteredMovies } : filteredMovies;
+    return usePagination
+      ? { ...data, results: filteredMovies }
+      : filteredMovies;
   }
 }

@@ -21,34 +21,12 @@ export class MoviesService {
   }) {
     const { page } = params;
 
-    type MoviesObj = {
-      results: {};
-      page: number;
-      total_pages: number;
-      total_results: number;
-    };
-    let response: any[] = [];
     const ITEMS_PER_PAGE = 20;
-    let movieCount = 0;
-    let nextPage = 1;
-    let total_pages = 0;
 
-    while (movieCount < ITEMS_PER_PAGE * page) {
-      const movies: Record<string, any> = await this.fetchMoviesUntilLimit({
-        ...params,
-        page: nextPage,
-      });
-
-      if (!movies?.results?.length) break;
-
-      response.push(...movies.results);
-      movieCount += movies.results.length;
-      nextPage++;
-      total_pages = movies.total_pages;
-
-      if (nextPage > total_pages) break;
-    }
-
+    const response: any[] = await this.fetchMoviesUntilLimit(params, ITEMS_PER_PAGE);
+    const total_pages = Math.ceil(response.length / ITEMS_PER_PAGE);
+    console.log(response.length)
+    console.log(total_pages);
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
 
@@ -61,28 +39,55 @@ export class MoviesService {
     };
   }
 
-  async fetchMoviesUntilLimit(params: {
-    query: string;
+  async fetchMoviesUntilLimit(params, itemsNeeded) {
+    let response: any[] = [];
+      const ITEMS_NEEDED = itemsNeeded;
+      let movieCount = 0;
+      let nextPage = 1;
+      let total_pages: number = 0;
+      while (movieCount < ITEMS_NEEDED) {
+        const movies: Record<string, any> | null =
+          await this.fetchMoviesIteration({
+            ...params,
+            page: nextPage,
+          });
+        if (!movies?.results?.length) break;
+
+        response.push(...movies.results);
+        movieCount += movies.results.length;
+        nextPage++;
+
+        if (total_pages === 0) total_pages = movies.total_pages;
+
+        if (nextPage > total_pages) break;
+      }
+      return response;
+  }
+
+  async fetchMoviesIteration(params: {
+    query?: string;
     include_adult: string;
     language: string;
     page: number;
+    genreId?: number;
   }) {
-    const { query: name, include_adult, language, page } = params;
-    if (!name?.trim()) {
-      throw new HttpException('Name query is required', HttpStatus.BAD_REQUEST);
-    }
+    const { query: name, include_adult, language, page, genreId } = params;
+
     try {
-      const url = this.buildTMDBSearchUrl(name, include_adult, language, page);
+      const url =
+        genreId !== undefined
+          ? this.buildTMDBByGenreUrl(genreId, include_adult, language, page)
+          : this.buildTMDBSearchUrl(name || '', include_adult, language, page);
+
       const options = this.getTMDBRequestOptions();
 
       const response = await fetch(url, options);
-      const text = await response.text();
 
-      if (!text) return [];
+      const textResponse = await response.text();
 
-      const temp = this.filterUkrainianMovies(JSON.parse(text), true);
-      console.log(temp);
-      return temp;
+      if (!textResponse) return null;
+
+      return this.filterUkrainianMovies(JSON.parse(textResponse), true);
     } catch (err) {
       throw new HttpException(
         'Failed to fetch movies by genre',
@@ -102,11 +107,11 @@ export class MoviesService {
     const options = this.getTMDBRequestOptions();
 
     const response = await fetch(url, options);
-    const text = await response.text();
+    const textResponse = await response.text();
 
-    if (!text) return [];
+    if (!textResponse) return [];
 
-    return this.filterUkrainianMovies(JSON.parse(text), false);
+    return this.filterUkrainianMovies(JSON.parse(textResponse), false);
   }
 
   isGenreIdArray(genreId: number | number[]): genreId is number[] {
@@ -123,7 +128,7 @@ export class MoviesService {
     return false;
   }
 
-  async getTMDBMoviesByGenreId(
+  async getMoviesByAllGenres(
     with_genres: string,
     params: {
       include_adult: string;
@@ -133,13 +138,10 @@ export class MoviesService {
   ) {
     const { include_adult, language, page } = params;
     const options = this.getTMDBRequestOptions();
-    let response: Response | Response[];
 
     const withSplittedGenres = with_genres.split(',');
 
     try {
-      let response: Response | Response[];
-
       if (withSplittedGenres.length > 1) {
         const genreUrls = withSplittedGenres.map((genreId) => ({
           genreId,
@@ -161,29 +163,8 @@ export class MoviesService {
         );
 
         return responses.map((item) => [item]); // Зберігаємо структуру відповіді
-      } else {
-        const genre = withSplittedGenres[0];
-        const url = this.buildTMDBByGenreUrl(
-          genre,
-          include_adult,
-          language,
-          page,
-        );
-
-        const res = await fetch(url, options);
-        if (!res.ok) {
-          throw new Error('Failed to fetch movies by genre');
-        }
-
-        const data = await res.json();
-        return [
-          {
-            genre: with_genres,
-            movies: this.filterUkrainianMovies(data, false),
-          },
-        ];
       }
-    } catch (error) {
+    } catch (err) {
       throw new HttpException(
         'Failed to fetch movies by genre',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -191,11 +172,30 @@ export class MoviesService {
     }
   }
 
-  private isResponseArray<T>(response: T | T[]): response is T[] {
-    if (Array.isArray(response)) {
-      return true;
+  async getTMDBMoviesByGenreId(params: {
+    include_adult: string;
+    language: string;
+    page: number;
+    genreId: number;
+  }) {
+    const { genreId } = params;
+
+    try {
+      const ITEMS_NEEDED = 100;
+      const response = await this.fetchMoviesUntilLimit(params, ITEMS_NEEDED);
+
+      return [
+        {
+          genre: genreId,
+          movies: response,
+        },
+      ];
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch movies by genre',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    return false;
   }
 
   private buildTMDBPopularUrl(
@@ -212,7 +212,7 @@ export class MoviesService {
     return `${baseUrl}?${params.toString()}&sort_by=popularity.desc`;
   }
   private buildTMDBByGenreUrl(
-    byGenre: string,
+    byGenre: string | number,
     include_adult: string,
     language: string,
     page: number,

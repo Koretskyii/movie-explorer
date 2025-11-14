@@ -55,16 +55,17 @@ export async function getMoviesByAllGenres() {
   };
   const options: RequestInit = { method: "GET" };
 
-  return fetchApi(`${MOVIES_URL}/genre`, options, params);
+  return fetchApi(`${MOVIES_URL}/all_genres`, options, params);
 }
 
-export async function getTopMoviesByGenreId(genreId: number) {
+export async function getMoviesByGenreId(genreId: number) {
   const params: MovieApiParams = {
     include_adult: false,
     language: "uk",
     page: 1,
+    genreId,
   };
   const options: RequestInit = { method: "GET" };
 
-  return fetchApi(`${MOVIES_URL}/genre/${genreId}`, options, params);
+  return await fetchApi(`${MOVIES_URL}/genre`, options, params);
 }

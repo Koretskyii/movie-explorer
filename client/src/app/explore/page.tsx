@@ -140,7 +140,7 @@ export default function ExplorePage() {
                   }}
                 >
                   <Link
-                    href={`/explore/genre/${genreSet.genre}`}
+                    href={`/explore/genre/?id=${genreSet.genre}`}
                     style={{ textDecoration: "none", color: "inherit" }}
                   >
                     {Object.values(GENRES).find(

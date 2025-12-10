@@ -1,6 +1,7 @@
 "use client";
 import { getMovieByName } from "@/api/api";
 import Search from "@/components/UI/Search/Search";
+import { useAppStore } from "@/store/store";
 import Pagination from "@mui/material/Pagination";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -16,7 +17,8 @@ export default function SearchPage() {
   const [searchInput, setSearchInput] = useState(
     searchParams.get("input") || ""
   );
-  const [searchedMovies, setSearchedMovies] = useState<any[]>([]);
+  const searchedMovies = useAppStore((state) => state.movies);
+  const setSearchedMovies = useAppStore((state) => state.setMovies);
   const [totalPages, setTotalPages] = useState<number | undefined>();
 
   useEffect(() => {

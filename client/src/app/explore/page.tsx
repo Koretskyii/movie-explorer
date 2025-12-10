@@ -3,6 +3,7 @@
 import { getMovieByPopularity, getMoviesByAllGenres } from "@/api/api";
 import Search from "@/components/UI/Search/Search";
 import { GENRES } from "@/constants/constants";
+import { useAppStore } from "@/store/store";
 import { sliceArray } from "@/utils/utils";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -13,8 +14,10 @@ import { useEffect, useState } from "react";
 
 export default function ExplorePage() {
   const [searchInput, setSearchInput] = useState("");
-  const [popularMovies, setPopularMovies] = useState<any[]>([]);
-  const [moviesByGenres, setMoviesByGenres] = useState<any[]>([]);
+  const popularMovies = useAppStore((state) => state.popularMovies);
+  const setPopularMovies = useAppStore((state) => state.setPopularMovies);
+  const moviesByGenres = useAppStore((state) => state.moviesByGenre);
+  const setMoviesByGenres = useAppStore((state) => state.setMoviesByGenre);
   useEffect(() => {
     retrievePopularMovies();
     retrieveMoviesByAllGenres();

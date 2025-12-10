@@ -4,19 +4,19 @@ import { getMoviesByGenreId } from "@/api/api";
 import { useSearchParams } from "next/navigation";
 import React, { forwardRef, useEffect, useState } from "react";
 import { VirtuosoGrid, VirtuosoGridProps } from "react-virtuoso";
+import { useAppStore } from "@/store/store";
 
 export default function GenrePage() {
   const searchParams = useSearchParams();
-  const [movies, setMovies] = useState<Array<{}>>([]);
+  const movies = useAppStore((state) => state.movies);
+  const setMovies = useAppStore((state) => state.setMovies);
 
   useEffect(() => {
     const loadMovies = async () => {
       let genreId: PropertyKey = searchParams.get("id") ?? "";
       genreId = parseInt(genreId);
-      console.debug("genre id on useEffect", genreId);
       const moviesResponse = await getMoviesByGenreId(genreId);
       setMovies(moviesResponse[0].movies);
-      console.debug(moviesResponse);
     };
     loadMovies();
   }, []);

@@ -7,7 +7,8 @@ const initialState = () => ({
     filters: {
         query: '',
         page: 1,
-    }
+    },
+    movieDetails: {},
 });
 
 const appStore = (set, get) => ({
@@ -30,6 +31,11 @@ const appStore = (set, get) => ({
     setMoviesByGenre: (moviesByGenre) => {
         set(({
             moviesByGenre
+        }))
+    },
+    setMovieDetails: (movieDetails) => {
+        set(({
+            movieDetails
         }))
     },
     reset: () => set(() => ({ ...initialState() })),

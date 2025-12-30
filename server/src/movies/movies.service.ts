@@ -198,6 +198,31 @@ export class MoviesService {
     }
   }
 
+  async getTMDBMovieDetails(params: {
+    include_adult: string;
+    language: string;
+    page: number;
+    id: number;
+  }) {
+    const { id, include_adult, language, page } = params;
+    try {
+      const url = this.buildTMDBMovieDetailsUrl(
+        id,
+        include_adult,
+        language,
+        page,
+      );
+      const options = this.getTMDBRequestOptions();
+      const response = await fetch(url, options);
+      return response.json(); 
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch movie details',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   private buildTMDBPopularUrl(
     include_adult: string,
     language: string,
@@ -211,6 +236,7 @@ export class MoviesService {
     });
     return `${baseUrl}?${params.toString()}&sort_by=popularity.desc`;
   }
+
   private buildTMDBByGenreUrl(
     byGenre: string | number,
     include_adult: string,
@@ -237,6 +263,21 @@ export class MoviesService {
     const baseUrl = 'https://api.themoviedb.org/3/search/movie';
     const params = new URLSearchParams({
       query: name,
+      include_adult,
+      language,
+      page: page.toString(),
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  private buildTMDBMovieDetailsUrl(
+    id: number,
+    include_adult: string,
+    language: string,
+    page: number,
+  ): string {
+    const baseUrl = `https://api.themoviedb.org/3/movie/${id}`;
+    const params = new URLSearchParams({
       include_adult,
       language,
       page: page.toString(),

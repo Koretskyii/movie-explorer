@@ -69,3 +69,13 @@ export async function getMoviesByGenreId(genreId: number) {
 
   return await fetchApi(`${MOVIES_URL}/genre`, options, params);
 }
+
+export async function getMovieDetails(id: string) {
+  const params: MovieApiParams = {
+    include_adult: false,
+    language: "uk",
+    page: 1,
+  }
+  const options: RequestInit = { method: "GET" };
+  return await fetchApi(`${MOVIES_URL}/details/${id}`, options, params);
+}

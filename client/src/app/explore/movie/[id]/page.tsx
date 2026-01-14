@@ -24,7 +24,6 @@ export default function MoviePage() {
       if (movieId) {
         const data = await getMovieDetails(movieId);
         setDetails(data);
-        console.log(data);
       }
     };
     fetchMovieDetails();

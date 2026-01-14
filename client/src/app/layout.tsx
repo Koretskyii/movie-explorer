@@ -4,6 +4,7 @@ import theme from "@/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { Header } from "@/components/Layout/Header/Header";
 import { Footer } from "@/components/Layout/Footer/Footer";
+import AuthModal from "@/components/Modal/AuthModal";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -17,6 +18,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" className={`${roboto.variable}`}>
       <body style={{ maxHeight: "100%", minHeight: "100%", margin: 0 }}>
@@ -24,6 +26,7 @@ export default function RootLayout({
           <ThemeProvider theme={theme}>
             <Header />
             {children}
+            <AuthModal />
             <Footer />
           </ThemeProvider>
         </AppRouterCacheProvider>

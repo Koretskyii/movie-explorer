@@ -1,4 +1,10 @@
+export const AUTH_URL = process.env.NEXT_PUBLIC_NEST_URL + "/auth";
 export const MOVIES_URL = process.env.NEXT_PUBLIC_NEST_URL + "/movies";
+
+export const AuthModes = {
+    LOGIN: 'login',
+    REGISTER: 'register',
+};
 
 export const GENRES = Object.freeze({
   ACTION: { id: 28, name: "Action" },

@@ -1,11 +1,18 @@
-export const buildFetchOptions = (options: RequestInit): RequestInit => {
+export const buildFetchOptions = (options: RequestInit, accessToken?: string | null): RequestInit => {
+  let headers: Record<string, any> = {
+    "Content-Type": "application/json",
+    ...options.headers,
+  };
+
+  if (accessToken) {
+    headers["Authorization"] = `Bearer ${accessToken}`;
+  }
+
   return {
     method: options.method,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    body: options.body ? JSON.stringify(options.body) : null,
+    headers,
+    body: options.body ?? null,
+    credentials: "include"
   };
 };
 

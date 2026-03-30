@@ -8,9 +8,15 @@ import { sliceArray } from "@/utils/utils";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
+import Card from "@mui/material/Card";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
+import Stack from "@mui/material/Stack";
+import Chip from "@mui/material/Chip";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import { TrendingUp, Film, Star } from "lucide-react";
 
 export default function ExplorePage() {
   const [searchInput, setSearchInput] = useState("");
@@ -18,18 +24,18 @@ export default function ExplorePage() {
   const setPopularMovies = useAppStore((state) => state.setPopularMovies);
   const moviesByGenres = useAppStore((state) => state.moviesByGenre);
   const setMoviesByGenres = useAppStore((state) => state.setMoviesByGenre);
+  
   useEffect(() => {
     retrievePopularMovies();
     retrieveMoviesByAllGenres();
   }, []);
 
   function retrieveMoviesByAllGenres() {
-    // TODO: move slicing movies to the server
     getMoviesByAllGenres().then((genres) => {
       const filteredMovies = genres.map((genreSet: any) => {
         return {
           genre: genreSet[0].genre,
-          movies: sliceArray(genreSet[0].movies, 0, 5),
+          movies: sliceArray(genreSet[0].movies, 0, 6),
         };
       });
       setMoviesByGenres([...filteredMovies]);
@@ -38,7 +44,7 @@ export default function ExplorePage() {
 
   function retrievePopularMovies() {
     getMovieByPopularity().then((movies) => {
-      setPopularMovies([...sliceArray(movies, 0, 5)]);
+      setPopularMovies([...sliceArray(movies, 0, 6)]);
     });
   }
 
@@ -59,148 +65,206 @@ export default function ExplorePage() {
     }
   };
 
-  return (
-    <div>
-      <h1>Explore Movies</h1>
-      <Search onChange={handleChangeSearchInput} onSearch={handleSearch} onKeyDown={handleKeyDown} />
-      <Container>
-        <Box sx={{ my: 2 }}>
-          <Typography variant="h5">Популярні фільми</Typography>
+  const MovieCard = ({ movie }: { movie: any }) => (
+    <Link
+      href={`explore/movie/${movie.id}`}
+      style={{ textDecoration: "none" }}
+    >
+      <Card
+        sx={{
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          overflow: 'hidden',
+          transition: 'all 0.3s ease',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          cursor: 'pointer',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          '&:hover': {
+            transform: 'translateY(-8px)',
+            boxShadow: '0 12px 24px rgba(229, 9, 20, 0.3)',
+            borderColor: 'primary.main',
+          },
+        }}
+      >
+        {movie.poster_path ? (
+          <CardMedia
+            component="img"
+            height="300"
+            image={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            alt={movie.title}
+            sx={{ objectFit: 'cover' }}
+          />
+        ) : (
           <Box
             sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 2,
-              border: "1px solid gray",
-              padding: 2,
-              marginTop: 2,
-              justifyContent: "center",
+              height: 300,
+              bgcolor: 'rgba(255, 255, 255, 0.05)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Film size={64} color="rgba(255, 255, 255, 0.2)" />
+          </Box>
+        )}
+        <CardContent sx={{ flex: 1 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              color: 'white',
+              fontWeight: 600,
+              mb: 1,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              minHeight: '3.6em',
+            }}
+          >
+            {movie.title}
+          </Typography>
+          {movie.vote_average && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Star size={16} fill="#e50914" color="#e50914" />
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                {movie.vote_average.toFixed(1)}
+              </Typography>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+    </Link>
+  );
+
+  return (
+    <Box sx={{ flex: 1, py: 4, bgcolor: 'background.default' }}>
+      <Container maxWidth="lg">
+        <Box sx={{ mb: 4 }}>
+          <Typography 
+            variant="h3" 
+            sx={{ 
+              mb: 2, 
+              fontWeight: 700,
+              background: "linear-gradient(135deg, #ffffff 0%, #e50914 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Explore Movies
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+            Відкрийте для себе найкращі фільми
+          </Typography>
+        </Box>
+
+        {/* Search */}
+        <Search 
+          onChange={handleChangeSearchInput} 
+          onSearch={handleSearch} 
+          onKeyDown={handleKeyDown} 
+        />
+
+        {/* Popular Movies Section */}
+        <Box sx={{ my: 6 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+            <TrendingUp size={28} color="#e50914" strokeWidth={2.5} />
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                fontWeight: 600,
+                color: 'white',
+              }}
+            >
+              Популярні фільми
+            </Typography>
+          </Box>
+          
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "repeat(auto-fill, minmax(200px, 1fr))",
+                sm: "repeat(auto-fill, minmax(220px, 1fr))",
+                md: "repeat(auto-fill, minmax(240px, 1fr))",
+              },
+              gap: 3,
             }}
           >
             {popularMovies.map((movie, index) => (
-              <Box
-                key={index}
-                sx={{
-                  width: 150,
-                  border: "1px solid #ccc",
-                  borderRadius: 2,
-                  padding: 1,
-                  textAlign: "center",
-                }}
-              >
-                <Link
-                  href={`explore/movie/${movie.id}`}
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  <Typography variant="subtitle1">{movie.title}</Typography>
-                </Link>
-              </Box>
+              <MovieCard key={index} movie={movie} />
             ))}
           </Box>
         </Box>
-      </Container>
 
-      <Container maxWidth="lg">
-        <Box sx={{ my: 4 }}>
-          <Typography
-            variant="h5"
-            textAlign="center"
-            gutterBottom
-            sx={{ fontWeight: 600 }}
-          >
-            Фільми за жанрами
-          </Typography>
+        {/* Movies by Genres Section */}
+        <Box sx={{ my: 6 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4, justifyContent: 'center' }}>
+            <Film size={28} color="#e50914" strokeWidth={2.5} />
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 600,
+                color: 'white',
+              }}
+            >
+              Фільми за жанрами
+            </Typography>
+          </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 4,
-              mt: 2,
-            }}
-          >
+          <Stack spacing={6}>
             {moviesByGenres.map((genreSet, index) => (
-              <Box
-                key={index}
-                sx={{
-                  border: "1px solid #ddd",
-                  borderRadius: 3,
-                  padding: 3,
-                  backgroundColor: "#fafafa",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
-                  width: "100%",
-                  maxWidth: 1000,
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{
-                    textAlign: "center",
-                    mb: 3,
-                    fontWeight: 600,
-                    color: "#333",
-                  }}
+              <Box key={index}>
+                <Link
+                  href={`/explore/genre/?id=${genreSet.genre}`}
+                  style={{ textDecoration: "none" }}
                 >
-                  <Link
-                    href={`/explore/genre/?id=${genreSet.genre}`}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    {Object.values(GENRES).find(
-                      (genre) => genre.id == genreSet.genre
-                    )?.name || "Unknown Genre"}
-                  </Link>
-                </Typography>
+                  <Chip
+                    label={
+                      Object.values(GENRES).find(
+                        (genre) => genre.id == genreSet.genre
+                      )?.name || "Unknown Genre"
+                    }
+                    sx={{
+                      mb: 3,
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      py: 3,
+                      px: 2,
+                      bgcolor: 'rgba(229, 9, 20, 0.15)',
+                      color: 'white',
+                      border: '1px solid rgba(229, 9, 20, 0.3)',
+                      '&:hover': {
+                        bgcolor: 'rgba(229, 9, 20, 0.25)',
+                        borderColor: 'primary.main',
+                      },
+                    }}
+                  />
+                </Link>
+                
                 <Box
                   sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    gap: 2,
-                    justifyContent: "center",
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "repeat(auto-fill, minmax(180px, 1fr))",
+                      sm: "repeat(auto-fill, minmax(200px, 1fr))",
+                      md: "repeat(auto-fill, minmax(220px, 1fr))",
+                    },
+                    gap: 3,
                   }}
                 >
-                  {genreSet.movies.map((movie: any, index: number) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        border: "1px solid #ccc",
-                        borderRadius: 2,
-                        padding: 2,
-                        width: 180,
-                        textAlign: "center",
-                        backgroundColor: "#fff",
-                        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-                        transition: "transform 0.2s",
-                        "&:hover": {
-                          transform: "scale(1.02)",
-                          borderColor: "#999",
-                        },
-                      }}
-                    >
-                      <Link
-                        href={`explore/movie/${movie.id}`}
-                        style={{ textDecoration: "none", color: "inherit" }}
-                      >
-                        <Typography
-                          variant="subtitle1"
-                          sx={{
-                            fontWeight: 500,
-                            fontSize: "1rem",
-                            color: "#222",
-                          }}
-                        >
-                          {movie.title}
-                        </Typography>
-                      </Link>
-                    </Box>
+                  {genreSet.movies.map((movie: any, movieIndex: number) => (
+                    <MovieCard key={movieIndex} movie={movie} />
                   ))}
                 </Box>
               </Box>
             ))}
-          </Box>
+          </Stack>
         </Box>
       </Container>
-    </div>
+    </Box>
   );
 }

@@ -3,7 +3,7 @@
 import { getMoviesByGenreId } from "@/api/api";
 import { GENRES } from "@/constants/constants";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useAppStore } from "@/store/store";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -18,7 +18,7 @@ import Button from "@mui/material/Button";
 
 import { Movie } from "@/types/types";
 
-export default function GenrePage() {
+function GenrePageContent() {
   const searchParams = useSearchParams();
   const movies = useAppStore((state) => state.movies);
   const setMovies = useAppStore((state) => state.setMovies);
@@ -194,5 +194,13 @@ export default function GenrePage() {
         )}
       </Container>
     </Box>
+  );
+}
+
+export default function GenrePage() {
+  return (
+    <Suspense fallback={<Box sx={{ flex: 1, py: 4, bgcolor: "background.default" }}><Container maxWidth="lg"><Typography variant="h6" sx={{ mt: 4, textAlign: "center" }}>Loading...</Typography></Container></Box>}>
+      <GenrePageContent />
+    </Suspense>
   );
 }

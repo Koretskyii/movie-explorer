@@ -2,8 +2,8 @@ export const AUTH_URL = process.env.NEXT_PUBLIC_NEST_URL + "/auth";
 export const MOVIES_URL = process.env.NEXT_PUBLIC_NEST_URL + "/movies";
 
 export const AuthModes = {
-    LOGIN: 'login',
-    REGISTER: 'register',
+  LOGIN: "login",
+  REGISTER: "register",
 };
 
 export const GENRES = Object.freeze({
@@ -25,5 +25,5 @@ export const GENRES = Object.freeze({
   TV_MOVIE: { id: 10770, name: "TV Movie" },
   THRILLER: { id: 53, name: "Thriller" },
   WAR: { id: 10752, name: "War" },
-  WESTERN: { id: 37, name: "Western" }
+  WESTERN: { id: 37, name: "Western" },
 });

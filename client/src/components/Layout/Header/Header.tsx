@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useAuthStore } from "@/store/store";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
@@ -19,12 +19,12 @@ export function Header() {
   const Logout = () => logout();
 
   return (
-    <AppBar 
-      position="sticky" 
-      sx={{ 
-        bgcolor: 'rgba(20, 20, 20, 0.95)',
-        backdropFilter: 'blur(10px)',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+    <AppBar
+      position="sticky"
+      sx={{
+        bgcolor: "rgba(20, 20, 20, 0.95)",
+        backdropFilter: "blur(10px)",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.5)",
       }}
     >
       <Container maxWidth="lg">
@@ -32,12 +32,13 @@ export function Header() {
           <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               <Film size={28} color="#e50914" strokeWidth={2.5} />
-              <Typography 
-                variant="h6" 
-                sx={{ 
+              <Typography
+                variant="h6"
+                sx={{
                   fontWeight: 700,
-                  letterSpacing: '-0.5px',
-                  background: "linear-gradient(135deg, #ffffff 0%, #e50914 100%)",
+                  letterSpacing: "-0.5px",
+                  background:
+                    "linear-gradient(135deg, #ffffff 0%, #e50914 100%)",
                   backgroundClip: "text",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",

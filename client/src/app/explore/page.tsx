@@ -24,7 +24,7 @@ export default function ExplorePage() {
   const setPopularMovies = useAppStore((state) => state.setPopularMovies);
   const moviesByGenres = useAppStore((state) => state.moviesByGenre);
   const setMoviesByGenres = useAppStore((state) => state.setMoviesByGenre);
-  
+
   useEffect(() => {
     retrievePopularMovies();
     retrieveMoviesByAllGenres();
@@ -60,31 +60,28 @@ export default function ExplorePage() {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSearch();
     }
   };
 
   const MovieCard = ({ movie }: { movie: any }) => (
-    <Link
-      href={`explore/movie/${movie.id}`}
-      style={{ textDecoration: "none" }}
-    >
+    <Link href={`explore/movie/${movie.id}`} style={{ textDecoration: "none" }}>
       <Card
         sx={{
-          bgcolor: 'background.paper',
+          bgcolor: "background.paper",
           borderRadius: 2,
-          overflow: 'hidden',
-          transition: 'all 0.3s ease',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          cursor: 'pointer',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          '&:hover': {
-            transform: 'translateY(-8px)',
-            boxShadow: '0 12px 24px rgba(229, 9, 20, 0.3)',
-            borderColor: 'primary.main',
+          overflow: "hidden",
+          transition: "all 0.3s ease",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          cursor: "pointer",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          "&:hover": {
+            transform: "translateY(-8px)",
+            boxShadow: "0 12px 24px rgba(229, 9, 20, 0.3)",
+            borderColor: "primary.main",
           },
         }}
       >
@@ -94,16 +91,16 @@ export default function ExplorePage() {
             height="300"
             image={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
             alt={movie.title}
-            sx={{ objectFit: 'cover' }}
+            sx={{ objectFit: "cover" }}
           />
         ) : (
           <Box
             sx={{
               height: 300,
-              bgcolor: 'rgba(255, 255, 255, 0.05)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              bgcolor: "rgba(255, 255, 255, 0.05)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <Film size={64} color="rgba(255, 255, 255, 0.2)" />
@@ -113,23 +110,23 @@ export default function ExplorePage() {
           <Typography
             variant="h6"
             sx={{
-              color: 'white',
+              color: "white",
               fontWeight: 600,
               mb: 1,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
               WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              minHeight: '3.6em',
+              WebkitBoxOrient: "vertical",
+              minHeight: "3.6em",
             }}
           >
             {movie.title}
           </Typography>
           {movie.vote_average && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               <Star size={16} fill="#e50914" color="#e50914" />
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 {movie.vote_average.toFixed(1)}
               </Typography>
             </Box>
@@ -140,13 +137,13 @@ export default function ExplorePage() {
   );
 
   return (
-    <Box sx={{ flex: 1, py: 4, bgcolor: 'background.default' }}>
+    <Box sx={{ flex: 1, py: 4, bgcolor: "background.default" }}>
       <Container maxWidth="lg">
         <Box sx={{ mb: 4 }}>
-          <Typography 
-            variant="h3" 
-            sx={{ 
-              mb: 2, 
+          <Typography
+            variant="h3"
+            sx={{
+              mb: 2,
               fontWeight: 700,
               background: "linear-gradient(135deg, #ffffff 0%, #e50914 100%)",
               backgroundClip: "text",
@@ -156,33 +153,33 @@ export default function ExplorePage() {
           >
             Explore Movies
           </Typography>
-          <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+          <Typography variant="body1" sx={{ color: "text.secondary", mb: 3 }}>
             Відкрийте для себе найкращі фільми
           </Typography>
         </Box>
 
         {/* Search */}
-        <Search 
-          onChange={handleChangeSearchInput} 
-          onSearch={handleSearch} 
-          onKeyDown={handleKeyDown} 
+        <Search
+          onChange={handleChangeSearchInput}
+          onSearch={handleSearch}
+          onKeyDown={handleKeyDown}
         />
 
         {/* Popular Movies Section */}
         <Box sx={{ my: 6 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
             <TrendingUp size={28} color="#e50914" strokeWidth={2.5} />
-            <Typography 
-              variant="h4" 
-              sx={{ 
+            <Typography
+              variant="h4"
+              sx={{
                 fontWeight: 600,
-                color: 'white',
+                color: "white",
               }}
             >
               Популярні фільми
             </Typography>
           </Box>
-          
+
           <Box
             sx={{
               display: "grid",
@@ -202,13 +199,21 @@ export default function ExplorePage() {
 
         {/* Movies by Genres Section */}
         <Box sx={{ my: 6 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4, justifyContent: 'center' }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+              mb: 4,
+              justifyContent: "center",
+            }}
+          >
             <Film size={28} color="#e50914" strokeWidth={2.5} />
             <Typography
               variant="h4"
               sx={{
                 fontWeight: 600,
-                color: 'white',
+                color: "white",
               }}
             >
               Фільми за жанрами
@@ -230,21 +235,21 @@ export default function ExplorePage() {
                     }
                     sx={{
                       mb: 3,
-                      fontSize: '1.1rem',
+                      fontSize: "1.1rem",
                       fontWeight: 600,
                       py: 3,
                       px: 2,
-                      bgcolor: 'rgba(229, 9, 20, 0.15)',
-                      color: 'white',
-                      border: '1px solid rgba(229, 9, 20, 0.3)',
-                      '&:hover': {
-                        bgcolor: 'rgba(229, 9, 20, 0.25)',
-                        borderColor: 'primary.main',
+                      bgcolor: "rgba(229, 9, 20, 0.15)",
+                      color: "white",
+                      border: "1px solid rgba(229, 9, 20, 0.3)",
+                      "&:hover": {
+                        bgcolor: "rgba(229, 9, 20, 0.25)",
+                        borderColor: "primary.main",
                       },
                     }}
                   />
                 </Link>
-                
+
                 <Box
                   sx={{
                     display: "grid",

@@ -63,20 +63,22 @@ export default function Search(props: {
           fullWidth
           variant="standard"
           onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(event)}
-          onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => onKeyDown(event)}
+          onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>
+            onKeyDown(event)
+          }
           sx={{
-            '& .MuiInput-root': {
-              color: 'white',
-              fontSize: '1.05rem',
+            "& .MuiInput-root": {
+              color: "white",
+              fontSize: "1.05rem",
               px: 2,
               py: 1.5,
-              '&:before, &:after': {
-                display: 'none',
+              "&:before, &:after": {
+                display: "none",
               },
             },
-            '& .MuiInput-input': {
-              '&::placeholder': {
-                color: 'rgba(255, 255, 255, 0.4)',
+            "& .MuiInput-input": {
+              "&::placeholder": {
+                color: "rgba(255, 255, 255, 0.4)",
                 opacity: 1,
               },
             },

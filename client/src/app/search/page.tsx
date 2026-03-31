@@ -29,7 +29,7 @@ export default function SearchPage() {
       if (searchInput !== "") {
         const data = await getMovieByName(searchInput, currentPage);
         const { results: movies, total_pages: totalPages } = data;
-        setSearchedMovies([...(movies)]);
+        setSearchedMovies([...movies]);
         setTotalPages(totalPages);
       }
     }
@@ -56,13 +56,13 @@ export default function SearchPage() {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSearch(event);
     }
   };
 
   return (
-    <Box sx={{ flex: 1, py: 4, bgcolor: 'background.default' }}>
+    <Box sx={{ flex: 1, py: 4, bgcolor: "background.default" }}>
       <Container maxWidth="lg">
         <Search
           onChange={handleChangeSearchInput}
@@ -71,35 +71,41 @@ export default function SearchPage() {
           initialValue={searchInput}
         />
         {searchedMovies.length === 0 && (
-          <Typography variant="h6" sx={{ mt: 4, textAlign: 'center', color: 'text.secondary' }}>
+          <Typography
+            variant="h6"
+            sx={{ mt: 4, textAlign: "center", color: "text.secondary" }}
+          >
             No movies found.
           </Typography>
         )}
         <Box sx={{ mt: 3 }}>
           {searchedMovies?.map((movie, index) => (
-            <Box 
+            <Box
               key={index}
-              sx={{ 
-                mb: 3, 
-                p: 3, 
-                bgcolor: 'background.paper', 
+              sx={{
+                mb: 3,
+                p: 3,
+                bgcolor: "background.paper",
                 borderRadius: 2,
-                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' }
+                "&:hover": { bgcolor: "rgba(255, 255, 255, 0.05)" },
               }}
             >
-              <Link href={`explore/movie/${movie.id}`} style={{ textDecoration: 'none' }}>
-                <Typography variant="h5" sx={{ color: 'white', mb: 1 }}>
+              <Link
+                href={`explore/movie/${movie.id}`}
+                style={{ textDecoration: "none" }}
+              >
+                <Typography variant="h5" sx={{ color: "white", mb: 1 }}>
                   {movie.title}
                 </Typography>
               </Link>
-              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+              <Typography variant="body1" sx={{ color: "text.secondary" }}>
                 {movie.overview}
               </Typography>
             </Box>
           ))}
         </Box>
         {(totalPages ?? 0) > 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <Pagination
               count={totalPages}
               page={currentPage}
@@ -109,13 +115,13 @@ export default function SearchPage() {
                 handlePageChange(e, value);
               }}
               sx={{
-                '& .MuiPaginationItem-root': {
-                  color: 'white',
-                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                "& .MuiPaginationItem-root": {
+                  color: "white",
+                  borderColor: "rgba(255, 255, 255, 0.3)",
                 },
-                '& .Mui-selected': {
-                  bgcolor: 'primary.main',
-                  borderColor: 'primary.main',
+                "& .Mui-selected": {
+                  bgcolor: "primary.main",
+                  borderColor: "primary.main",
                 },
               }}
             />

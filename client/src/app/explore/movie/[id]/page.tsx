@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { getMovieDetails } from "@/api/api";
 import { useAppStore } from "@/store/store";
 import Box from "@mui/material/Box";
@@ -32,9 +32,17 @@ export default function MoviePage() {
   }, [movieId]);
 
   return (
-    <Box sx={{ flex: 1, py: 4, bgcolor: 'background.default' }}>
+    <Box sx={{ flex: 1, py: 4, bgcolor: "background.default" }}>
       <Container maxWidth="md">
-        <Card sx={{ maxWidth: 800, borderRadius: 3, boxShadow: 4, mx: "auto", bgcolor: 'background.paper' }}>
+        <Card
+          sx={{
+            maxWidth: 800,
+            borderRadius: 3,
+            boxShadow: 4,
+            mx: "auto",
+            bgcolor: "background.paper",
+          }}
+        >
           <CardMedia
             component="img"
             height="350"
@@ -44,7 +52,12 @@ export default function MoviePage() {
           />
 
           <CardContent>
-            <Typography variant="h5" fontWeight={600} gutterBottom sx={{ color: 'white' }}>
+            <Typography
+              variant="h5"
+              fontWeight={600}
+              gutterBottom
+              sx={{ color: "white" }}
+            >
               {details.title}
             </Typography>
 
@@ -58,7 +71,7 @@ export default function MoviePage() {
               ))}
             </Stack>
 
-            <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+            <Typography variant="body2" sx={{ mb: 2, color: "text.secondary" }}>
               {details.overview}
             </Typography>
 

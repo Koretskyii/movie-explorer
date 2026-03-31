@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -25,7 +25,8 @@ export function Main() {
     <Box
       sx={{
         flex: 1,
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(20,20,20,0.95) 100%), url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1200 600\"><rect fill=\"%23141414\" width=\"1200\" height=\"600\"/><g fill-opacity=\"0.05\"><circle fill=\"%23e50914\" cx=\"100\" cy=\"100\" r=\"100\"/><circle fill=\"%23e50914\" cx=\"900\" cy=\"400\" r=\"150\"/><circle fill=\"%23e50914\" cx=\"1100\" cy=\"150\" r=\"80\"/></g></svg>')",
+        background:
+          'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(20,20,20,0.95) 100%), url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23141414" width="1200" height="600"/><g fill-opacity="0.05"><circle fill="%23e50914" cx="100" cy="100" r="100"/><circle fill="%23e50914" cx="900" cy="400" r="150"/><circle fill="%23e50914" cx="1100" cy="150" r="80"/></g></svg>\')',
         backgroundSize: "cover",
         backgroundPosition: "center",
         display: "flex",
@@ -151,7 +152,7 @@ export function Main() {
             </Box>
           </Box>
 
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
             <Link href="/explore" style={{ textDecoration: "none" }}>
               <Button
                 variant="contained"

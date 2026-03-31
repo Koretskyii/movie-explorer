@@ -8,7 +8,7 @@ export class UsersService {
   findById(id: string) {
     return this.prisma.user.findUnique({ where: { id } });
   }
-  
+
   findByEmail(email: string) {
     return this.prisma.user.findUnique({ where: { email } });
   }

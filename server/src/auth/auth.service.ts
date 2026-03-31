@@ -19,7 +19,9 @@ export class AuthService {
     return await this.usersService.create({ email: dto.email, password: hash });
   }
 
-  async login(user: any): Promise<{ access_token: string; refresh_token: string }> {
+  async login(
+    user: any,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const payload = { email: user.email, sub: user.id };
 
     return {
@@ -30,7 +32,7 @@ export class AuthService {
       refresh_token: this.jwtService.sign(payload, {
         secret: this.configServise.get('JWT_REFRESH_SECRET'),
         expiresIn: '7d',
-      })
+      }),
     };
   }
 

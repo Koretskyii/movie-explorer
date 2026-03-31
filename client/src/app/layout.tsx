@@ -19,10 +19,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en" className={`${roboto.variable}`} style={{ height: "100%" }}>
-      <body style={{ margin: 0, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <body
+        style={{
+          margin: 0,
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <Header />

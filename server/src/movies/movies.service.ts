@@ -23,9 +23,12 @@ export class MoviesService {
 
     const ITEMS_PER_PAGE = 20;
 
-    const response: any[] = await this.fetchMoviesUntilLimit(params, ITEMS_PER_PAGE);
+    const response: any[] = await this.fetchMoviesUntilLimit(
+      params,
+      ITEMS_PER_PAGE,
+    );
     const total_pages = Math.ceil(response.length / ITEMS_PER_PAGE);
-    console.log(response.length)
+    console.log(response.length);
     console.log(total_pages);
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -41,27 +44,27 @@ export class MoviesService {
 
   async fetchMoviesUntilLimit(params, itemsNeeded) {
     let response: any[] = [];
-      const ITEMS_NEEDED = itemsNeeded;
-      let movieCount = 0;
-      let nextPage = 1;
-      let total_pages: number = 0;
-      while (movieCount < ITEMS_NEEDED) {
-        const movies: Record<string, any> | null =
-          await this.fetchMoviesIteration({
-            ...params,
-            page: nextPage,
-          });
-        if (!movies?.results?.length) break;
+    const ITEMS_NEEDED = itemsNeeded;
+    let movieCount = 0;
+    let nextPage = 1;
+    let total_pages: number = 0;
+    while (movieCount < ITEMS_NEEDED) {
+      const movies: Record<string, any> | null =
+        await this.fetchMoviesIteration({
+          ...params,
+          page: nextPage,
+        });
+      if (!movies?.results?.length) break;
 
-        response.push(...movies.results);
-        movieCount += movies.results.length;
-        nextPage++;
+      response.push(...movies.results);
+      movieCount += movies.results.length;
+      nextPage++;
 
-        if (total_pages === 0) total_pages = movies.total_pages;
+      if (total_pages === 0) total_pages = movies.total_pages;
 
-        if (nextPage > total_pages) break;
-      }
-      return response;
+      if (nextPage > total_pages) break;
+    }
+    return response;
   }
 
   async fetchMoviesIteration(params: {
@@ -214,7 +217,7 @@ export class MoviesService {
       );
       const options = this.getTMDBRequestOptions();
       const response = await fetch(url, options);
-      return response.json(); 
+      return response.json();
     } catch (error) {
       throw new HttpException(
         'Failed to fetch movie details',

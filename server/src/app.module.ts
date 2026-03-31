@@ -10,7 +10,13 @@ import { AuthModule } from './auth/auth.module';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 @Module({
-  imports: [UsersModule, PrismaModule, AuthModule, MoviesModule, ConfigModule.forRoot({ isGlobal: true })],
+  imports: [
+    UsersModule,
+    PrismaModule,
+    AuthModule,
+    MoviesModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+  ],
   controllers: [AppController],
   providers: [
     AppService,

@@ -18,7 +18,7 @@ export default function AccountPage() {
     if (!isAuthenticated) {
       setLoginModalOpen(true);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, setLoginModalOpen]);
 
   return (
     <Box sx={{ flex: 1, py: 6, bgcolor: "background.default" }}>

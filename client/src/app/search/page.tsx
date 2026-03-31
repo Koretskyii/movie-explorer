@@ -8,9 +8,10 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { Movie } from "@/types/types";
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams: URLSearchParams = useSearchParams();
   const router = useRouter();
 
@@ -34,7 +35,7 @@ export default function SearchPage() {
       }
     }
     fetchMovies();
-  }, [searchParams]);
+  }, [searchParams, currentPage, searchInput, setSearchedMovies]);
 
   const handleSearch = (event: React.FormEvent<HTMLElement>) => {
     event.preventDefault();
@@ -79,7 +80,7 @@ export default function SearchPage() {
           </Typography>
         )}
         <Box sx={{ mt: 3 }}>
-          {searchedMovies?.map((movie, index) => (
+          {searchedMovies?.map((movie: Movie, index) => (
             <Box
               key={index}
               sx={{
@@ -129,5 +130,13 @@ export default function SearchPage() {
         )}
       </Container>
     </Box>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<Box sx={{ flex: 1, py: 4, bgcolor: "background.default" }}><Container maxWidth="lg"><Typography variant="h6" sx={{ mt: 4, textAlign: "center" }}>Loading...</Typography></Container></Box>}>
+      <SearchPageContent />
+    </Suspense>
   );
 }

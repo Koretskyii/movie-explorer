@@ -13,7 +13,7 @@ const initialState = () => ({
   movieDetails: {},
 });
 
-const appStore = (set, get) => ({
+const appStore = (set) => ({
   ...initialState(),
   setFilter: (key, value) => {
     set((state) => ({
@@ -43,7 +43,7 @@ const appStore = (set, get) => ({
   reset: () => set(() => ({ ...initialState() })),
 });
 
-const AuthStore = (set, get) => ({
+const AuthStore = (set) => ({
   access_token: null,
   isLoginModalOpen: false,
   isAuthenticated: false,

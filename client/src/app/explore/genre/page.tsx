@@ -3,7 +3,7 @@
 import { getMoviesByGenreId } from "@/api/api";
 import { GENRES } from "@/constants/constants";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useAppStore } from "@/store/store";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -16,11 +16,13 @@ import Link from "next/link";
 import { Film, Star, ArrowLeft } from "lucide-react";
 import Button from "@mui/material/Button";
 
-export default function GenrePage() {
+import { Movie } from "@/types/types";
+
+function GenrePageContent() {
   const searchParams = useSearchParams();
   const movies = useAppStore((state) => state.movies);
   const setMovies = useAppStore((state) => state.setMovies);
-  const genreId = parseInt(searchParams.get("id") ?? "0");
+  const genreId = searchParams.get("id") ?? "0";
   const genreName =
     Object.values(GENRES).find((genre) => genre.id === genreId)?.name ||
     "Unknown Genre";
@@ -33,9 +35,9 @@ export default function GenrePage() {
       }
     };
     loadMovies();
-  }, [genreId]);
+  }, [genreId, setMovies]);
 
-  const MovieCard = ({ movie }: { movie: any }) => (
+  const MovieCard = ({ movie }: { movie: Movie }) => (
     <Link
       href={`/explore/movie/${movie.id}`}
       style={{ textDecoration: "none" }}
@@ -185,12 +187,20 @@ export default function GenrePage() {
               gap: 3,
             }}
           >
-            {movies.map((movie: any, index: number) => (
+            {movies.map((movie: Movie, index: number) => (
               <MovieCard key={index} movie={movie} />
             ))}
           </Box>
         )}
       </Container>
     </Box>
+  );
+}
+
+export default function GenrePage() {
+  return (
+    <Suspense fallback={<Box sx={{ flex: 1, py: 4, bgcolor: "background.default" }}><Container maxWidth="lg"><Typography variant="h6" sx={{ mt: 4, textAlign: "center" }}>Loading...</Typography></Container></Box>}>
+      <GenrePageContent />
+    </Suspense>
   );
 }

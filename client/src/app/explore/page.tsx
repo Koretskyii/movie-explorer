@@ -18,6 +18,8 @@ import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { TrendingUp, Film, Star } from "lucide-react";
 
+import { Movie, MoviesByGenre } from "@/types/types";
+
 export default function ExplorePage() {
   const [searchInput, setSearchInput] = useState("");
   const popularMovies = useAppStore((state) => state.popularMovies);
@@ -25,28 +27,31 @@ export default function ExplorePage() {
   const moviesByGenres = useAppStore((state) => state.moviesByGenre);
   const setMoviesByGenres = useAppStore((state) => state.setMoviesByGenre);
 
-  useEffect(() => {
-    retrievePopularMovies();
-    retrieveMoviesByAllGenres();
-  }, []);
-
-  function retrieveMoviesByAllGenres() {
+  const retrieveMoviesByAllGenres = () => {
     getMoviesByAllGenres().then((genres) => {
-      const filteredMovies = genres.map((genreSet: any) => {
-        return {
-          genre: genreSet[0].genre,
-          movies: sliceArray(genreSet[0].movies, 0, 6),
-        };
-      });
+      const filteredMovies = genres.map(
+        (genreSet: [{ genre: string; movies: Movie[][] }]) => {
+          return {
+            genre: genreSet[0].genre,
+            movies: sliceArray(genreSet[0].movies, 0, 6),
+          };
+        }
+      );
       setMoviesByGenres([...filteredMovies]);
     });
-  }
+  };
 
-  function retrievePopularMovies() {
+  const retrievePopularMovies = () => {
     getMovieByPopularity().then((movies) => {
       setPopularMovies([...sliceArray(movies, 0, 6)]);
     });
-  }
+  };
+
+  useEffect(() => {
+    retrievePopularMovies();
+    retrieveMoviesByAllGenres();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSearch = async () => {
     redirect(`/search?input=${searchInput}`);
@@ -65,7 +70,7 @@ export default function ExplorePage() {
     }
   };
 
-  const MovieCard = ({ movie }: { movie: any }) => (
+  const MovieCard = ({ movie }: { movie: Movie }) => (
     <Link href={`explore/movie/${movie.id}`} style={{ textDecoration: "none" }}>
       <Card
         sx={{
@@ -221,7 +226,7 @@ export default function ExplorePage() {
           </Box>
 
           <Stack spacing={6}>
-            {moviesByGenres.map((genreSet, index) => (
+            {moviesByGenres.map((genreSet: MoviesByGenre, index: number) => (
               <Box key={index}>
                 <Link
                   href={`/explore/genre/?id=${genreSet.genre}`}
@@ -261,7 +266,7 @@ export default function ExplorePage() {
                     gap: 3,
                   }}
                 >
-                  {genreSet.movies.map((movie: any, movieIndex: number) => (
+                  {genreSet.movies.map((movie: Movie, movieIndex: number) => (
                     <MovieCard key={movieIndex} movie={movie} />
                   ))}
                 </Box>

@@ -13,7 +13,9 @@ export const fetchApi = async (
   params: QueryParams
 ) => {
   const access_token: string | null = useAuthStore.getState().access_token;
-  const queryString = new URLSearchParams(params as Record<string, string>).toString();
+  const queryString = new URLSearchParams(
+    params as Record<string, string>
+  ).toString();
   const response = await fetch(
     `${url}?${queryString}`,
     buildFetchOptions(options, access_token)

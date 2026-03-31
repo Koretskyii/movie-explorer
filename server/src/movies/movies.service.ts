@@ -1,12 +1,13 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { franc } from 'franc-min';
+import { TMDBMovie, TMDBResponse } from './types/movie.types';
 
 @Injectable()
 export class MoviesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getMovieByName(name: string) {
+  getMovieByName(name: string) {
     if (!name?.trim()) {
       throw new HttpException('Name query is required', HttpStatus.BAD_REQUEST);
     }
@@ -42,25 +43,35 @@ export class MoviesService {
     };
   }
 
-  async fetchMoviesUntilLimit(params, itemsNeeded) {
-    let response: any[] = [];
+  async fetchMoviesUntilLimit(
+    params: Record<string, string | number>,
+    itemsNeeded: number,
+  ): Promise<TMDBMovie[]> {
+    const response: TMDBMovie[] = [];
     const ITEMS_NEEDED = itemsNeeded;
     let movieCount = 0;
     let nextPage = 1;
-    let total_pages: number = 0;
+    let total_pages = 0;
     while (movieCount < ITEMS_NEEDED) {
-      const movies: Record<string, any> | null =
-        await this.fetchMoviesIteration({
-          ...params,
-          page: nextPage,
-        });
-      if (!movies?.results?.length) break;
+      const movies: TMDBResponse | null = await this.fetchMoviesIteration({
+        include_adult: String(params.include_adult || 'false'),
+        language: String(params.language || 'uk-UA'),
+        page: nextPage,
+        ...(params.query && { query: String(params.query) }),
+        ...(params.genreId && { genreId: String(params.genreId) }),
+      });
+      if (
+        !movies?.results ||
+        !Array.isArray(movies.results) ||
+        movies.results.length === 0
+      )
+        break;
 
       response.push(...movies.results);
       movieCount += movies.results.length;
       nextPage++;
 
-      if (total_pages === 0) total_pages = movies.total_pages;
+      if (total_pages === 0) total_pages = movies.total_pages || 0;
 
       if (nextPage > total_pages) break;
     }
@@ -72,8 +83,8 @@ export class MoviesService {
     include_adult: string;
     language: string;
     page: number;
-    genreId?: number;
-  }) {
+    genreId?: string;
+  }): Promise<TMDBResponse | null> {
     const { query: name, include_adult, language, page, genreId } = params;
 
     try {
@@ -90,8 +101,14 @@ export class MoviesService {
 
       if (!textResponse) return null;
 
-      return this.filterUkrainianMovies(JSON.parse(textResponse), true);
-    } catch (err) {
+      const parsed: unknown = JSON.parse(textResponse);
+      const data = parsed as TMDBResponse;
+      const filtered = this.filterUkrainianMovies(data, true);
+      if (Array.isArray(filtered)) {
+        return { results: filtered, total_pages: 1 };
+      }
+      return filtered;
+    } catch {
       throw new HttpException(
         'Failed to fetch movies by genre',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -114,14 +131,8 @@ export class MoviesService {
 
     if (!textResponse) return [];
 
-    return this.filterUkrainianMovies(JSON.parse(textResponse), false);
-  }
-
-  isGenreIdArray(genreId: number | number[]): genreId is number[] {
-    if (Array.isArray(genreId)) {
-      return true;
-    }
-    return false;
+    const parsed: unknown = JSON.parse(textResponse);
+    return this.filterUkrainianMovies(parsed as TMDBResponse, false);
   }
 
   isGenreListIsString(genreList: string | null): genreList is string | null {
@@ -157,7 +168,8 @@ export class MoviesService {
             if (!res.ok) {
               throw new Error('Failed to fetch movies by genre');
             }
-            const data = await res.json();
+            const parsed: unknown = await res.json();
+            const data = parsed as TMDBResponse;
             return {
               genre: genreId,
               movies: this.filterUkrainianMovies(data, false),
@@ -167,7 +179,7 @@ export class MoviesService {
 
         return responses.map((item) => [item]); // Зберігаємо структуру відповіді
       }
-    } catch (err) {
+    } catch {
       throw new HttpException(
         'Failed to fetch movies by genre',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -179,7 +191,7 @@ export class MoviesService {
     include_adult: string;
     language: string;
     page: number;
-    genreId: number;
+    genreId: string;
   }) {
     const { genreId } = params;
 
@@ -193,7 +205,7 @@ export class MoviesService {
           movies: response,
         },
       ];
-    } catch (error) {
+    } catch {
       throw new HttpException(
         'Failed to fetch movies by genre',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -206,7 +218,7 @@ export class MoviesService {
     language: string;
     page: number;
     id: number;
-  }) {
+  }): Promise<Record<string, unknown>> {
     const { id, include_adult, language, page } = params;
     try {
       const url = this.buildTMDBMovieDetailsUrl(
@@ -217,8 +229,9 @@ export class MoviesService {
       );
       const options = this.getTMDBRequestOptions();
       const response = await fetch(url, options);
-      return response.json();
-    } catch (error) {
+      const data: unknown = await response.json();
+      return data as Record<string, unknown>;
+    } catch {
       throw new HttpException(
         'Failed to fetch movie details',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -299,11 +312,10 @@ export class MoviesService {
   }
 
   private filterUkrainianMovies(
-    data: Record<string, any[]>,
+    data: TMDBResponse,
     usePagination: boolean,
-  ): Record<string, any[]> | Record<string, any>[] {
-    const movies: Record<string, any>[] = data.results;
-    const filteredMovies = movies.filter((movie) => {
+  ): TMDBResponse | TMDBMovie[] {
+    const filteredMovies = data.results.filter((movie) => {
       return (
         franc(movie.title || '') === 'ukr' ||
         franc(movie.overview || '') === 'ukr'

@@ -13,7 +13,6 @@ import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { MovieDetails } from "@/types/types";
 
-
 export default function MoviePage() {
   const details: MovieDetails = useAppStore((state) => state.movieDetails);
   const setDetails = useAppStore((state) => state.setMovieDetails);

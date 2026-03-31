@@ -35,8 +35,11 @@ jobs:
           cd client && npm run lint
           cd ../server && npm run lint
 
+      - name: Format check (Prettier)
+        run: cd client && npm run format:check
+
       - name: Run client tests
-        run: cd client && npm test -- --watchAll=false
+        run: cd client && npm test
 
       - name: Run server tests
         run: cd server && npm test
@@ -57,8 +60,7 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Deploy client to Vercel
-        working-directory: ./client
-        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: cd client && vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

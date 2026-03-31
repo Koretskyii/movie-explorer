@@ -16,11 +16,13 @@ import Link from "next/link";
 import { Film, Star, ArrowLeft } from "lucide-react";
 import Button from "@mui/material/Button";
 
+import { Movie } from "@/types/types";
+
 export default function GenrePage() {
   const searchParams = useSearchParams();
   const movies = useAppStore((state) => state.movies);
   const setMovies = useAppStore((state) => state.setMovies);
-  const genreId = parseInt(searchParams.get("id") ?? "0");
+  const genreId = searchParams.get("id") ?? "0";
   const genreName =
     Object.values(GENRES).find((genre) => genre.id === genreId)?.name ||
     "Unknown Genre";
@@ -33,9 +35,9 @@ export default function GenrePage() {
       }
     };
     loadMovies();
-  }, [genreId]);
+  }, [genreId, setMovies]);
 
-  const MovieCard = ({ movie }: { movie: any }) => (
+  const MovieCard = ({ movie }: { movie: Movie }) => (
     <Link
       href={`/explore/movie/${movie.id}`}
       style={{ textDecoration: "none" }}
@@ -185,7 +187,7 @@ export default function GenrePage() {
               gap: 3,
             }}
           >
-            {movies.map((movie: any, index: number) => (
+            {movies.map((movie: Movie, index: number) => (
               <MovieCard key={index} movie={movie} />
             ))}
           </Box>

@@ -11,11 +11,9 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
+import { MovieDetails } from "@/types/types";
 
-type MovieDetails = {
-  title?: string;
-  [key: string]: any;
-};
+
 export default function MoviePage() {
   const details: MovieDetails = useAppStore((state) => state.movieDetails);
   const setDetails = useAppStore((state) => state.setMovieDetails);
@@ -29,7 +27,7 @@ export default function MoviePage() {
       }
     };
     fetchMovieDetails();
-  }, [movieId]);
+  }, [movieId, setDetails]);
 
   return (
     <Box sx={{ flex: 1, py: 4, bgcolor: "background.default" }}>

@@ -1,15 +1,19 @@
 import { AUTH_URL, GENRES, MOVIES_URL } from "@/constants/constants";
 import { useAuthStore } from "@/store/store";
-import { MovieApiParams, SearchMovieApiParams } from "@/types/types";
+import {
+  MovieApiParams,
+  QueryParams,
+  SearchMovieApiParams,
+} from "@/types/types";
 import { buildFetchOptions } from "@/utils/utils";
 
 export const fetchApi = async (
   url: string,
   options: RequestInit,
-  params: Record<string, any>
+  params: QueryParams
 ) => {
   const access_token: string | null = useAuthStore.getState().access_token;
-  const queryString = new URLSearchParams(params).toString();
+  const queryString = new URLSearchParams(params as Record<string, string>).toString();
   const response = await fetch(
     `${url}?${queryString}`,
     buildFetchOptions(options, access_token)
@@ -79,7 +83,7 @@ export async function getMoviesByAllGenres() {
   return fetchApi(`${MOVIES_URL}/all_genres`, options, params);
 }
 
-export async function getMoviesByGenreId(genreId: number) {
+export async function getMoviesByGenreId(genreId: string) {
   const params: MovieApiParams = {
     include_adult: false,
     language: "uk",

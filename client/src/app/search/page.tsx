@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Movie } from "@/types/types";
 
 export default function SearchPage() {
   const searchParams: URLSearchParams = useSearchParams();
@@ -34,7 +35,7 @@ export default function SearchPage() {
       }
     }
     fetchMovies();
-  }, [searchParams]);
+  }, [searchParams, currentPage, searchInput, setSearchedMovies]);
 
   const handleSearch = (event: React.FormEvent<HTMLElement>) => {
     event.preventDefault();
@@ -79,7 +80,7 @@ export default function SearchPage() {
           </Typography>
         )}
         <Box sx={{ mt: 3 }}>
-          {searchedMovies?.map((movie, index) => (
+          {searchedMovies?.map((movie: Movie, index) => (
             <Box
               key={index}
               sx={{

@@ -1,7 +1,10 @@
-export const buildFetchOptions = (options: RequestInit, accessToken?: string | null): RequestInit => {
-  let headers: Record<string, any> = {
+export const buildFetchOptions = (
+  options: RequestInit,
+  accessToken?: string | null
+): RequestInit => {
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   if (accessToken) {
@@ -12,10 +15,14 @@ export const buildFetchOptions = (options: RequestInit, accessToken?: string | n
     method: options.method,
     headers,
     body: options.body ?? null,
-    credentials: "include"
+    credentials: "include",
   };
 };
 
-export const sliceArray: <T>(array: T[], start: number, end: number) => T[] = (array, start, end) => {
+export const sliceArray: <T>(array: T[], start: number, end: number) => T[] = (
+  array,
+  start,
+  end
+) => {
   return array?.slice(start, end);
 };

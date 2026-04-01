@@ -1,10 +1,19 @@
 import { AuthService } from './auth.service';
-import { Body, Controller, Get, Post, Request, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import type { Response } from 'express';
 import { RegisterDto } from './dto/register.dto';
 import { JwtGuard } from './guards/jwt.guard';
 import { LocalGuard } from './guards/local.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import type { RequestWithUser } from './types/auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -17,8 +26,11 @@ export class AuthController {
 
   @UseGuards(LocalGuard)
   @Post('login')
-  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
-    const { access_token, refresh_token } = await this.authService.login(req.user);
+  login(
+    @Request() req: RequestWithUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { access_token, refresh_token } = this.authService.login(req.user);
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       sameSite: 'none',
@@ -32,13 +44,13 @@ export class AuthController {
   // TODO: delete the example
   @UseGuards(JwtGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Request() req: RequestWithUser) {
     return req.user;
   }
 
   @UseGuards(JwtRefreshGuard)
   @Post('refresh_token')
-  refreshToken(@Request() req) {
+  refreshToken(@Request() req: RequestWithUser) {
     return this.authService.refreshToken(req.user);
   }
 }

@@ -1,26 +1,38 @@
 import { AUTH_URL, GENRES, MOVIES_URL } from "@/constants/constants";
 import { useAuthStore } from "@/store/store";
-import { MovieApiParams, SearchMovieApiParams } from "@/types/types";
+import {
+  MovieApiParams,
+  QueryParams,
+  SearchMovieApiParams,
+} from "@/types/types";
 import { buildFetchOptions } from "@/utils/utils";
 
 export const fetchApi = async (
   url: string,
   options: RequestInit,
-  params: Record<string, any>,
+  params: QueryParams
 ) => {
-  const access_token : string | null = useAuthStore.getState().access_token;
-  const queryString = new URLSearchParams(params).toString();
-  const response = await fetch(`${url}?${queryString}`, buildFetchOptions(options, access_token));
+  const access_token: string | null = useAuthStore.getState().access_token;
+  const queryString = new URLSearchParams(
+    params as Record<string, string>
+  ).toString();
+  const response = await fetch(
+    `${url}?${queryString}`,
+    buildFetchOptions(options, access_token)
+  );
 
   if (response.status === 401) {
     const refreshed = await refreshAccessToken();
-    
+
     if (refreshed) {
       const access_token = useAuthStore.getState().access_token;
-      const retryResponse = await fetch(`${url}?${queryString}`, buildFetchOptions(options, access_token || ''));
+      const retryResponse = await fetch(
+        `${url}?${queryString}`,
+        buildFetchOptions(options, access_token || "")
+      );
       return handleRefreshResponse(retryResponse);
     } else {
-      throw new Error('Session expired. Please login again.');
+      throw new Error("Session expired. Please login again.");
     }
   }
 
@@ -73,7 +85,7 @@ export async function getMoviesByAllGenres() {
   return fetchApi(`${MOVIES_URL}/all_genres`, options, params);
 }
 
-export async function getMoviesByGenreId(genreId: number) {
+export async function getMoviesByGenreId(genreId: string) {
   const params: MovieApiParams = {
     include_adult: false,
     language: "uk",
@@ -90,30 +102,45 @@ export async function getMovieDetails(id: string) {
     include_adult: false,
     language: "uk",
     page: 1,
-  }
+  };
   const options: RequestInit = { method: "GET" };
   return await fetchApi(`${MOVIES_URL}/details/${id}`, options, params);
 }
 
-export async function RegisterRequest({ email, password }: {email: string, password: string}) {
+export async function RegisterRequest({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) {
   const requestBody = {
     email,
     password,
   };
 
-  const options: RequestInit = { method: "POST", body: JSON.stringify(requestBody) };
+  const options: RequestInit = {
+    method: "POST",
+    body: JSON.stringify(requestBody),
+  };
 
   return await fetchApi(`${AUTH_URL}/register`, options, {});
 }
 
-export async function LoginRequest({ email, password }: {email: string, password: string}) {
+export async function LoginRequest({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) {
   const requestBody = {
     email,
-    password
+    password,
   };
 
-  const options: RequestInit = { 
-    method: "POST", 
+  const options: RequestInit = {
+    method: "POST",
     body: JSON.stringify(requestBody),
   };
 
@@ -123,10 +150,13 @@ export async function LoginRequest({ email, password }: {email: string, password
 const refreshAccessToken = async (): Promise<boolean> => {
   try {
     const options: RequestInit = {
-      method: 'POST',
+      method: "POST",
     };
 
-    const response = await fetch(`${AUTH_URL}/refresh_token`, buildFetchOptions(options));
+    const response = await fetch(
+      `${AUTH_URL}/refresh_token`,
+      buildFetchOptions(options)
+    );
 
     if (response.ok) {
       const data = await response.json();
@@ -139,11 +169,11 @@ const refreshAccessToken = async (): Promise<boolean> => {
       return true;
     }
 
-    console.warn('Token refresh failed with status:', response.status);
-    
+    console.warn("Token refresh failed with status:", response.status);
+
     return false;
   } catch (error) {
-    console.error('Token refresh error:', error);
+    console.error("Token refresh error:", error);
     return false;
   }
 };

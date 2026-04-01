@@ -39,7 +39,7 @@ export class MoviesController {
 
   @Get('genre')
   async getMoviesByGenreId(
-    @Query('genreId') genreId: number,
+    @Query('genreId') genreId: string,
     @Query('include_adult') include_adult: string,
     @Query('language') language: string,
     @Query('page') page: number,

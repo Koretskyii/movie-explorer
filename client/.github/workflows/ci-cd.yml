@@ -1,0 +1,64 @@
+name: Monorepo CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd client && npm ci
+          cd ../server && npm ci
+
+      - name: Lint client and server
+        run: |
+          cd client && npm run lint
+          cd ../server && npm run lint
+
+      - name: Run client tests
+        run: cd client && npm test -- --watchAll=false
+
+      - name: Run server tests
+        run: cd server && npm test
+
+      - name: Build client and server
+        run: |
+          cd client && npm run build
+          cd ../server && npm run build
+
+  deploy:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Deploy client to Vercel
+        working-directory: ./client
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes --cwd
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

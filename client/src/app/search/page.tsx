@@ -135,7 +135,17 @@ function SearchPageContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<Box sx={{ flex: 1, py: 4, bgcolor: "background.default" }}><Container maxWidth="lg"><Typography variant="h6" sx={{ mt: 4, textAlign: "center" }}>Loading...</Typography></Container></Box>}>
+    <Suspense
+      fallback={
+        <Box sx={{ flex: 1, py: 4, bgcolor: "background.default" }}>
+          <Container maxWidth="lg">
+            <Typography variant="h6" sx={{ mt: 4, textAlign: "center" }}>
+              Loading...
+            </Typography>
+          </Container>
+        </Box>
+      }
+    >
       <SearchPageContent />
     </Suspense>
   );
